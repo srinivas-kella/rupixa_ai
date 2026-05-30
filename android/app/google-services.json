@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "71902093466",
+    "project_id": "rupixa-ai-d2b6e",
+    "storage_bucket": "rupixa-ai-d2b6e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:71902093466:android:94a6906750f2b771dd7f23",
+        "android_client_info": {
+          "package_name": "com.rupixa.ai"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "71902093466-idniag3b77i4oe6oajgvghqkgd6t9mjs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rupixa.ai",
+            "certificate_hash": "6ff93300f2289148c05ff9c330530293883220bf"
+          }
+        },
+        {
+          "client_id": "71902093466-63ovjsr3qgppumga47lig0clki740bgo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAO5ByQSYhL2OlJWxCF9YsWpXEPKD2Oy08"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "71902093466-63ovjsr3qgppumga47lig0clki740bgo.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "71902093466-mef3avk1qac6adp1d66up67sfenkjhkj.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.rupixaAi"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
