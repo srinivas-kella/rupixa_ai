@@ -1,11 +1,13 @@
 import 'dart:ui';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../providers/theme_provider.dart';
 import '../../routes/app_routes.dart';
@@ -27,6 +29,47 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool biometrics = false;
 
   bool cloudBackup = true;
+
+  bool isLoading = true;
+
+  /// =========================================
+  /// INIT
+  /// =========================================
+
+  @override
+  void initState() {
+    super.initState();
+
+    _loadSettings();
+  }
+
+  /// =========================================
+  /// LOAD SETTINGS
+  /// =========================================
+
+  Future<void> _loadSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      notifications = prefs.getBool('notifications') ?? true;
+
+      biometrics = prefs.getBool('biometrics') ?? false;
+
+      cloudBackup = prefs.getBool('cloudBackup') ?? true;
+
+      isLoading = false;
+    });
+  }
+
+  /// =========================================
+  /// SAVE SETTINGS
+  /// =========================================
+
+  Future<void> _saveSetting(String key, bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.setBool(key, value);
+  }
 
   /// =========================================
   /// LOGOUT POPUP
@@ -75,10 +118,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
               style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
             ),
 
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
 
-              context.go(AppRoutes.login);
+              await FirebaseAuth.instance.signOut();
+
+              if (context.mounted) {
+                context.go(AppRoutes.login);
+              }
             },
           ),
         ],
@@ -92,528 +139,534 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     final isDark = themeProvider.isDarkMode;
 
+    final user = FirebaseAuth.instance.currentUser;
+
+    final userName = user?.displayName ?? "Guest User";
+
+    final userEmail = user?.email ?? "No Email";
+
+    final userPhoto = user?.photoURL;
+
+    if (isLoading) {
+      return const Scaffold(body: Center(child: CupertinoActivityIndicator()));
+    }
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F6FF),
+      backgroundColor: const Color(0xFFF5F7FF),
 
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-
-        elevation: 0,
-
-        centerTitle: false,
-
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-
-          children: [
-            Text(
-              "Settings",
-
-              style: GoogleFonts.poppins(
-                fontSize: 30,
-
-                fontWeight: FontWeight.w700,
-
-                color: Colors.black,
-              ),
-            ),
-
-            Text(
-              "Manage your preferences",
-
-              style: GoogleFonts.poppins(
-                color: Colors.grey.shade600,
-
-                fontSize: 13,
-              ),
-            ),
-          ],
-        ),
-      ),
-
-      body: SingleChildScrollView(
+      body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
 
-        padding: const EdgeInsets.fromLTRB(20, 10, 20, 120),
+        slivers: [
+          /// PREMIUM APPBAR
+          SliverAppBar(
+            pinned: true,
+            floating: false,
+            stretch: false,
+            elevation: 0,
+            systemOverlayStyle: isDark
+                ? SystemUiOverlayStyle.light
+                : SystemUiOverlayStyle.dark,
+            toolbarHeight: 100,
+            expandedHeight: 150,
+            collapsedHeight: 100,
+            automaticallyImplyLeading: false,
+            backgroundColor: Colors.transparent,
+            surfaceTintColor: Colors.transparent,
 
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+            flexibleSpace: LayoutBuilder(
+              builder: (context, constraints) {
+                final top = constraints.biggest.height;
 
-          children: [
-            /// ====================================
-            /// PROFILE CARD
-            /// ====================================
-            ClipRRect(
-              borderRadius: BorderRadius.circular(36),
+                final collapsed = top <= 100;
 
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-
-                child: Container(
-                  width: double.infinity,
-
-                  padding: const EdgeInsets.all(28),
-
+                return Container(
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [primary, secondary],
+                    borderRadius: const BorderRadius.vertical(
+                      bottom: Radius.circular(32),
                     ),
 
-                    borderRadius: BorderRadius.circular(36),
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
 
-                    boxShadow: [
-                      BoxShadow(
-                        color: primary.withValues(alpha: 0.35),
+                      colors: collapsed
+                          ? [
+                              Colors.white.withOpacity(0.96),
+                              Colors.white.withOpacity(0.88),
+                            ]
+                          : [const Color(0xFFF5F7FF), const Color(0xFFEFF2FF)],
+                    ),
 
-                        blurRadius: 28,
-
-                        offset: const Offset(0, 14),
-                      ),
-                    ],
+                    boxShadow: collapsed
+                        ? [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.04),
+                              blurRadius: 18,
+                              offset: const Offset(0, 6),
+                            ),
+                          ]
+                        : [],
                   ),
 
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(4),
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                      bottom: Radius.circular(32),
+                    ),
 
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(
+                        sigmaX: collapsed ? 18 : 0,
+                        sigmaY: collapsed ? 18 : 0,
+                      ),
 
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.5),
+                      child: SafeArea(
+                        bottom: false,
 
-                            width: 2,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 22,
+                            vertical: 10,
                           ),
-                        ),
 
-                        child: const CircleAvatar(
-                          radius: 34,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
 
-                          backgroundColor: Colors.white,
+                            children: [
+                              Expanded(
+                                child: AnimatedPadding(
+                                  duration: const Duration(milliseconds: 250),
 
-                          child: Icon(
-                            CupertinoIcons.person_fill,
+                                  padding: EdgeInsets.only(
+                                    bottom: collapsed ? 2 : 6,
+                                  ),
 
-                            size: 36,
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.end,
 
-                            color: primary,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+
+                                    children: [
+                                      AnimatedSwitcher(
+                                        duration: const Duration(
+                                          milliseconds: 220,
+                                        ),
+
+                                        child: collapsed
+                                            ? const SizedBox.shrink()
+                                            : Container(
+                                                key: const ValueKey("badge"),
+
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 12,
+                                                      vertical: 6,
+                                                    ),
+
+                                                decoration: BoxDecoration(
+                                                  color: primary.withOpacity(
+                                                    0.10,
+                                                  ),
+
+                                                  borderRadius:
+                                                      BorderRadius.circular(30),
+                                                ),
+
+                                                child: Text(
+                                                  "Rupixa AI Preferences",
+
+                                                  style: GoogleFonts.poppins(
+                                                    color: primary,
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 11,
+                                                  ),
+                                                ),
+                                              ),
+                                      ),
+
+                                      SizedBox(height: collapsed ? 4 : 10),
+
+                                      FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        alignment: Alignment.centerLeft,
+
+                                        child: ShaderMask(
+                                          shaderCallback: (bounds) {
+                                            return const LinearGradient(
+                                              colors: [
+                                                Color(0xFF111827),
+                                                primary,
+                                                secondary,
+                                              ],
+                                            ).createShader(bounds);
+                                          },
+
+                                          child: Text(
+                                            "Settings",
+
+                                            maxLines: 1,
+
+                                            overflow: TextOverflow.ellipsis,
+
+                                            style: GoogleFonts.poppins(
+                                              color: Colors.white,
+
+                                              fontSize: collapsed ? 22 : 34,
+
+                                              fontWeight: FontWeight.w800,
+
+                                              letterSpacing: -1.4,
+
+                                              height: 1,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(width: 14),
+
+                              AnimatedContainer(
+                                duration: const Duration(milliseconds: 250),
+
+                                height: collapsed ? 48 : 58,
+                                width: collapsed ? 48 : 58,
+
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(
+                                    collapsed ? 18 : 22,
+                                  ),
+
+                                  gradient: const LinearGradient(
+                                    colors: [primary, secondary],
+                                  ),
+
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: primary.withOpacity(0.24),
+                                      blurRadius: 20,
+                                      offset: const Offset(0, 10),
+                                    ),
+                                  ],
+                                ),
+
+                                child: const Icon(
+                                  CupertinoIcons.sparkles,
+                                  color: Colors.white,
+                                  size: 24,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
 
-                      const SizedBox(width: 18),
+          /// CONTENT
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 120),
 
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
 
+                children: [
+                  /// HERO PROFILE CARD
+                  Container(
+                    width: double.infinity,
+
+                    padding: const EdgeInsets.all(26),
+
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(38),
+
+                      gradient: const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [primary, secondary],
+                      ),
+
+                      boxShadow: [
+                        BoxShadow(
+                          color: primary.withOpacity(0.22),
+                          blurRadius: 28,
+                          offset: const Offset(0, 16),
+                        ),
+                      ],
+                    ),
+
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+
+                      children: [
+                        Row(
                           children: [
-                            Text(
-                              'Nani',
+                            Hero(
+                              tag: "profile",
 
-                              style: GoogleFonts.poppins(
-                                color: Colors.white,
+                              child: CircleAvatar(
+                                radius: 36,
+                                backgroundColor: Colors.white,
 
-                                fontSize: 26,
+                                backgroundImage: userPhoto != null
+                                    ? NetworkImage(userPhoto)
+                                    : null,
 
-                                fontWeight: FontWeight.bold,
+                                child: userPhoto == null
+                                    ? const Icon(
+                                        CupertinoIcons.person_fill,
+                                        size: 36,
+                                        color: primary,
+                                      )
+                                    : null,
                               ),
                             ),
 
-                            const SizedBox(height: 8),
+                            const Spacer(),
 
                             Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 14,
-
-                                vertical: 6,
+                                vertical: 8,
                               ),
 
                               decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.18),
+                                color: Colors.white.withOpacity(0.15),
 
-                                borderRadius: BorderRadius.circular(14),
+                                borderRadius: BorderRadius.circular(18),
                               ),
 
-                              child: Text(
-                                'Premium Member',
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    CupertinoIcons.checkmark_seal_fill,
+                                    color: Colors.white,
+                                    size: 16,
+                                  ),
+
+                                  const SizedBox(width: 6),
+
+                                  Text(
+                                    "Premium",
+
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 22),
+
+                        Text(
+                          userName,
+
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+
+                        const SizedBox(height: 6),
+
+                        Text(
+                          userEmail,
+
+                          style: GoogleFonts.poppins(
+                            color: Colors.white.withOpacity(0.82),
+                            fontSize: 13,
+                          ),
+                        ),
+
+                        const SizedBox(height: 18),
+
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 10,
+                          ),
+
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.12),
+
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+
+                            children: [
+                              const Icon(
+                                CupertinoIcons.cloud_fill,
+                                color: Colors.white,
+                                size: 16,
+                              ),
+
+                              const SizedBox(width: 8),
+
+                              Text(
+                                "AI Cloud Sync Enabled",
 
                                 style: GoogleFonts.poppins(
                                   color: Colors.white,
-
                                   fontWeight: FontWeight.w500,
-
                                   fontSize: 12,
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      Container(
-                        padding: const EdgeInsets.all(14),
-
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.14),
-
-                          shape: BoxShape.circle,
-                        ),
-
-                        child: const Icon(
-                          CupertinoIcons.star_fill,
-
-                          color: Colors.white,
-
-                          size: 24,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 34),
-
-            /// ====================================
-            /// PREFERENCES
-            /// ====================================
-            Text(
-              "Preferences",
-
-              style: GoogleFonts.poppins(
-                fontSize: 22,
-
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            _premiumSwitchTile(
-              icon: CupertinoIcons.moon_fill,
-
-              iconColor: Colors.deepPurple,
-
-              title: "Dark Mode",
-
-              subtitle: "Enable premium dark appearance",
-
-              value: isDark,
-
-              onChanged: (value) async {
-                await HapticFeedback.lightImpact();
-
-                themeProvider.toggleTheme(value);
-              },
-            ),
-
-            _premiumSwitchTile(
-              icon: CupertinoIcons.bell_fill,
-
-              iconColor: Colors.orange,
-
-              title: "Notifications",
-
-              subtitle: "Receive reminders and alerts",
-
-              value: notifications,
-
-              onChanged: (value) async {
-                await HapticFeedback.lightImpact();
-
-                setState(() {
-                  notifications = value;
-                });
-              },
-            ),
-
-            _premiumSwitchTile(
-              icon: CupertinoIcons.lock_shield_fill,
-
-              iconColor: Colors.green,
-
-              title: "Face ID / App Lock",
-
-              subtitle: "Secure your financial data",
-
-              value: biometrics,
-
-              onChanged: (value) async {
-                await HapticFeedback.lightImpact();
-
-                setState(() {
-                  biometrics = value;
-                });
-              },
-            ),
-
-            _premiumSwitchTile(
-              icon: CupertinoIcons.cloud_fill,
-
-              iconColor: Colors.blue,
-
-              title: "Cloud Backup",
-
-              subtitle: "Automatically sync app data",
-
-              value: cloudBackup,
-
-              onChanged: (value) async {
-                await HapticFeedback.lightImpact();
-
-                setState(() {
-                  cloudBackup = value;
-                });
-              },
-            ),
-
-            const SizedBox(height: 34),
-
-            /// ====================================
-            /// DATA & SECURITY
-            /// ====================================
-            Text(
-              "Data & Security",
-
-              style: GoogleFonts.poppins(
-                fontSize: 22,
-
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            _actionTile(
-              icon: CupertinoIcons.arrow_down_doc_fill,
-
-              color: Colors.deepPurple,
-
-              title: "Export Data",
-
-              subtitle: "Download all financial records",
-
-              onTap: () async {
-                await HapticFeedback.mediumImpact();
-              },
-            ),
-
-            _actionTile(
-              icon: CupertinoIcons.cloud_upload_fill,
-
-              color: Colors.blue,
-
-              title: "Backup Data",
-
-              subtitle: "Create secure cloud backup",
-
-              onTap: () async {
-                await HapticFeedback.mediumImpact();
-              },
-            ),
-
-            _actionTile(
-              icon: CupertinoIcons.lock_fill,
-
-              color: Colors.orange,
-
-              title: "Privacy Policy",
-
-              subtitle: "Review data protection terms",
-
-              onTap: () async {
-                await HapticFeedback.mediumImpact();
-              },
-            ),
-
-            _actionTile(
-              icon: CupertinoIcons.doc_text_fill,
-
-              color: Colors.green,
-
-              title: "Terms & Conditions",
-
-              subtitle: "Read app usage guidelines",
-
-              onTap: () async {
-                await HapticFeedback.mediumImpact();
-              },
-            ),
-
-            const SizedBox(height: 34),
-
-            /// ====================================
-            /// APP INFO
-            /// ====================================
-            Container(
-              padding: const EdgeInsets.all(24),
-
-              decoration: BoxDecoration(
-                color: Colors.white,
-
-                borderRadius: BorderRadius.circular(30),
-
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-
-                    blurRadius: 16,
-
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(16),
-
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [primary, secondary],
+                            ],
                           ),
-
-                          borderRadius: BorderRadius.circular(20),
                         ),
-
-                        child: const Icon(
-                          CupertinoIcons.sparkles,
-
-                          color: Colors.white,
-
-                          size: 28,
-                        ),
-                      ),
-
-                      const SizedBox(width: 18),
-
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-
-                          children: [
-                            Text(
-                              "Rupixa AI",
-
-                              style: GoogleFonts.poppins(
-                                fontSize: 20,
-
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-
-                            const SizedBox(height: 6),
-
-                            Text(
-                              "Version 1.0.0",
-
-                              style: GoogleFonts.poppins(
-                                color: Colors.grey.shade600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 36),
 
-                  Divider(color: Colors.grey.shade200),
+                  Text(
+                    "Preferences",
+
+                    style: GoogleFonts.poppins(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
 
                   const SizedBox(height: 18),
 
-                  Text(
-                    "AI-powered premium finance management platform designed for modern financial tracking and smart insights.",
+                  _premiumSwitchTile(
+                    icon: CupertinoIcons.moon_fill,
+                    iconColor: Colors.deepPurple,
+                    title: "Dark Mode",
+                    subtitle: "Enable immersive dark experience",
+                    value: isDark,
+                    onChanged: (value) async {
+                      await HapticFeedback.lightImpact();
+                      themeProvider.toggleTheme(value);
+                    },
+                  ),
 
-                    textAlign: TextAlign.center,
+                  _premiumSwitchTile(
+                    icon: CupertinoIcons.bell_fill,
+                    iconColor: Colors.orange,
+                    title: "Notifications",
+                    subtitle: "Receive alerts and AI reminders",
+                    value: notifications,
+                    onChanged: (value) async {
+                      setState(() {
+                        notifications = value;
+                      });
 
-                    style: GoogleFonts.poppins(
-                      color: Colors.grey.shade600,
+                      await _saveSetting('notifications', value);
+                    },
+                  ),
 
-                      height: 1.6,
+                  _premiumSwitchTile(
+                    icon: CupertinoIcons.lock_shield_fill,
+                    iconColor: Colors.green,
+                    title: "App Lock",
+                    subtitle: "Protect your financial data",
+                    value: biometrics,
+                    onChanged: (value) async {
+                      setState(() {
+                        biometrics = value;
+                      });
+
+                      await _saveSetting('biometrics', value);
+                    },
+                  ),
+
+                  _premiumSwitchTile(
+                    icon: CupertinoIcons.cloud_fill,
+                    iconColor: Colors.blue,
+                    title: "Cloud Backup",
+                    subtitle: "Securely backup all your data",
+                    value: cloudBackup,
+                    onChanged: (value) async {
+                      setState(() {
+                        cloudBackup = value;
+                      });
+
+                      await _saveSetting('cloudBackup', value);
+                    },
+                  ),
+
+                  const SizedBox(height: 42),
+
+                  GestureDetector(
+                    onTap: () async {
+                      await HapticFeedback.mediumImpact();
+
+                      _showLogoutDialog();
+                    },
+
+                    child: Container(
+                      height: 68,
+                      width: double.infinity,
+
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(26),
+
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFFFF5A5F), Color(0xFFFF3B30)],
+                        ),
+
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.red.withOpacity(0.20),
+                            blurRadius: 18,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
+                      ),
+
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+
+                        children: [
+                          const Icon(
+                            CupertinoIcons.square_arrow_right_fill,
+                            color: Colors.white,
+                          ),
+
+                          const SizedBox(width: 12),
+
+                          Text(
+                            "Logout",
+
+                            style: GoogleFonts.poppins(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-
-            const SizedBox(height: 40),
-
-            /// ====================================
-            /// LOGOUT BUTTON
-            /// ====================================
-            GestureDetector(
-              onTap: () async {
-                await HapticFeedback.mediumImpact();
-
-                _showLogoutDialog();
-              },
-
-              child: Container(
-                height: 64,
-                width: double.infinity,
-
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Color(0xFFFF5A5F), Color(0xFFFF3B30)],
-                  ),
-
-                  borderRadius: BorderRadius.circular(24),
-
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.red.withValues(alpha: 0.25),
-
-                      blurRadius: 24,
-
-                      offset: Offset(0, 12),
-                    ),
-                  ],
-                ),
-
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-
-                  children: [
-                    const Icon(
-                      CupertinoIcons.square_arrow_right_fill,
-
-                      color: Colors.white,
-                    ),
-
-                    const SizedBox(width: 12),
-
-                    Text(
-                      "Logout",
-
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-
-                        fontSize: 18,
-
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
-
-  /// =========================================
-  /// SWITCH TILE
-  /// =========================================
 
   Widget _premiumSwitchTile({
     required IconData icon,
@@ -630,13 +683,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
         padding: const EdgeInsets.all(20),
 
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Colors.white.withOpacity(0.92),
 
           borderRadius: BorderRadius.circular(28),
 
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
+              color: Colors.black.withOpacity(0.04),
 
               blurRadius: 16,
 
@@ -651,7 +704,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               padding: const EdgeInsets.all(14),
 
               decoration: BoxDecoration(
-                color: iconColor.withValues(alpha: 0.12),
+                color: iconColor.withOpacity(0.12),
 
                 borderRadius: BorderRadius.circular(18),
               ),
@@ -696,105 +749,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
               value: value,
 
-              onChanged: onChanged,
+              onChanged: (v) {
+                onChanged(v);
+              },
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  /// =========================================
-  /// ACTION TILE
-  /// =========================================
-
-  Widget _actionTile({
-    required IconData icon,
-    required Color color,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-
-      child: GestureDetector(
-        onTap: onTap,
-
-        child: Container(
-          padding: const EdgeInsets.all(20),
-
-          decoration: BoxDecoration(
-            color: Colors.white,
-
-            borderRadius: BorderRadius.circular(28),
-
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
-
-                blurRadius: 16,
-
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(14),
-
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.12),
-
-                  borderRadius: BorderRadius.circular(18),
-                ),
-
-                child: Icon(icon, color: color),
-              ),
-
-              const SizedBox(width: 16),
-
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-
-                  children: [
-                    Text(
-                      title,
-
-                      style: GoogleFonts.poppins(
-                        fontSize: 17,
-
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-
-                    const SizedBox(height: 6),
-
-                    Text(
-                      subtitle,
-
-                      style: GoogleFonts.poppins(
-                        color: Colors.grey.shade600,
-
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              Icon(
-                CupertinoIcons.chevron_right,
-
-                size: 18,
-
-                color: Colors.grey.shade400,
-              ),
-            ],
-          ),
         ),
       ),
     );

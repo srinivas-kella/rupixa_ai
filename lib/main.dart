@@ -24,41 +24,52 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   /// =========================================
-  /// FULLSCREEN IMMERSIVE MODE
+  /// LOCK PORTRAIT
   /// =========================================
 
-  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
-  /// TRANSPARENT SYSTEM BARS
+  /// =========================================
+  /// PREMIUM SYSTEM UI
+  /// =========================================
+
+  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       systemNavigationBarColor: Colors.transparent,
+
+      statusBarBrightness: Brightness.light,
+
       statusBarIconBrightness: Brightness.dark,
       systemNavigationBarIconBrightness: Brightness.dark,
     ),
   );
 
   /// =========================================
-  /// FIREBASE INIT
+  /// 120HZ SMOOTH RENDERING
+  /// =========================================
+
+  PaintingBinding.instance.imageCache.maximumSize = 100;
+  PaintingBinding.instance.imageCache.maximumSizeBytes = 1024 * 1024 * 100;
+
+  /// =========================================
+  /// FIREBASE
   /// =========================================
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   /// =========================================
-  /// HIVE INIT
+  /// HIVE
   /// =========================================
 
   await Hive.initFlutter();
 
-  /// REGISTER ADAPTER
   Hive.registerAdapter(ExpenseModelAdapter());
-
   Hive.registerAdapter(BillModelAdapter());
 
-  /// OPEN BOX
   await Hive.openBox<ExpenseModel>('expensesBox');
-
   await Hive.openBox<BillModel>('billsBox');
 
   /// =========================================
