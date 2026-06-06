@@ -14,12 +14,12 @@ class ThemeProvider extends ChangeNotifier {
 
   bool get isDarkMode => _themeMode == ThemeMode.dark;
 
-  /// =========================
-  /// TOGGLE THEME
-  /// =========================
+  bool get isSystemMode => _themeMode == ThemeMode.system;
 
-  Future<void> toggleTheme(bool isDark) async {
-    _themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
+  Future<void> setThemeMode(ThemeMode mode) async {
+    if (_themeMode == mode) return;
+
+    _themeMode = mode;
 
     notifyListeners();
 
@@ -27,15 +27,19 @@ class ThemeProvider extends ChangeNotifier {
   }
 
   /// =========================
+  /// TOGGLE THEME
+  /// =========================
+
+  Future<void> toggleTheme(bool isDark) async {
+    await setThemeMode(isDark ? ThemeMode.dark : ThemeMode.light);
+  }
+
+  /// =========================
   /// SET SYSTEM THEME
   /// =========================
 
   Future<void> setSystemTheme() async {
-    _themeMode = ThemeMode.system;
-
-    notifyListeners();
-
-    await _saveTheme();
+    await setThemeMode(ThemeMode.system);
   }
 
   /// =========================

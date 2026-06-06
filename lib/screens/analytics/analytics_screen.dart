@@ -30,6 +30,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = colorScheme.brightness == Brightness.dark;
     final expenseProvider = Provider.of<ExpenseProvider>(context);
 
     final budgetProvider = Provider.of<BudgetProvider>(context);
@@ -84,10 +86,10 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         : min(total / monthlyBudget, 1.0);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F6FF),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       appBar: AppBar(
-        backgroundColor: Colors.white.withOpacity(0.85),
+        backgroundColor: colorScheme.surface.withValues(alpha: 0.85),
 
         elevation: 0,
 
@@ -105,7 +107,9 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
 
-            child: Container(color: Colors.white.withOpacity(0.72)),
+            child: Container(
+              color: colorScheme.surface.withValues(alpha: 0.72),
+            ),
           ),
         ),
 
@@ -119,7 +123,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
 
               decoration: BoxDecoration(
-                color: primary.withOpacity(0.08),
+                color: primary.withValues(alpha: 0.08),
 
                 borderRadius: BorderRadius.circular(30),
               ),
@@ -142,7 +146,11 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
             ShaderMask(
               shaderCallback: (bounds) {
                 return LinearGradient(
-                  colors: [const Color(0xFF15192D), primary, secondary],
+                  colors: [
+                    isDark ? Colors.white : const Color(0xFF15192D),
+                    primary,
+                    secondary,
+                  ],
                 ).createShader(bounds);
               },
 
@@ -186,14 +194,14 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   borderRadius: BorderRadius.circular(18),
 
                   gradient: LinearGradient(
-                    colors: [Colors.white, Colors.white.withOpacity(0.92)],
+                    colors: [Colors.white, Colors.white.withValues(alpha: 0.92)],
                   ),
 
-                  border: Border.all(color: Colors.white.withOpacity(0.7)),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.7)),
 
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
+                      color: Colors.black.withValues(alpha: 0.04),
 
                       blurRadius: 14,
 
@@ -245,7 +253,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
                 boxShadow: [
                   BoxShadow(
-                    color: primary.withOpacity(0.35),
+                    color: primary.withValues(alpha: 0.35),
 
                     blurRadius: 28,
 
@@ -296,7 +304,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                         padding: const EdgeInsets.all(18),
 
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.15),
+                          color: Colors.white.withValues(alpha: 0.15),
 
                           shape: BoxShape.circle,
                         ),
@@ -322,7 +330,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
                       value: spendingPercentage,
 
-                      backgroundColor: Colors.white.withOpacity(0.18),
+                      backgroundColor: Colors.white.withValues(alpha: 0.18),
 
                       valueColor: const AlwaysStoppedAnimation(Colors.white),
                     ),
@@ -441,7 +449,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
+                    color: Colors.black.withValues(alpha: 0.04),
 
                     blurRadius: 18,
 
@@ -559,7 +567,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                       padding: const EdgeInsets.all(18),
 
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.12),
+                        color: Colors.white.withValues(alpha: 0.12),
 
                         shape: BoxShape.circle,
                       ),
@@ -703,7 +711,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
             boxShadow: [
               BoxShadow(
-                color: primary.withOpacity(0.35),
+                color: primary.withValues(alpha: 0.35),
 
                 blurRadius: 24,
 
@@ -790,7 +798,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       padding: const EdgeInsets.all(18),
 
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.12),
+        color: Colors.white.withValues(alpha: 0.12),
 
         borderRadius: BorderRadius.circular(24),
       ),
@@ -860,7 +868,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
 
             blurRadius: 16,
 
@@ -877,7 +885,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
             padding: const EdgeInsets.all(12),
 
             decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
+              color: color.withValues(alpha: 0.12),
 
               borderRadius: BorderRadius.circular(18),
             ),
@@ -955,7 +963,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.04),
+                color: Colors.black.withValues(alpha: 0.04),
 
                 blurRadius: 16,
 
@@ -970,7 +978,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                 padding: const EdgeInsets.all(16),
 
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.12),
+                  color: color.withValues(alpha: 0.12),
 
                   borderRadius: BorderRadius.circular(22),
                 ),

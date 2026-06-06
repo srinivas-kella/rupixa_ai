@@ -9,8 +9,10 @@ class CloudExpensesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F7FC),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       appBar: AppBar(title: const Text('Cloud Expenses')),
 
@@ -23,7 +25,12 @@ class CloudExpensesScreen extends StatelessWidget {
           }
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(child: Text('No expenses found'));
+            return Center(
+              child: Text(
+                'No expenses found',
+                style: TextStyle(color: colorScheme.onSurface),
+              ),
+            );
           }
 
           final expenses = snapshot.data!.docs;
@@ -42,12 +49,15 @@ class CloudExpensesScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(18),
 
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: colorScheme.surface,
 
                   borderRadius: BorderRadius.circular(22),
 
-                  boxShadow: const [
-                    BoxShadow(color: Colors.black12, blurRadius: 6),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.08),
+                      blurRadius: 6,
+                    ),
                   ],
                 ),
 
@@ -73,7 +83,8 @@ class CloudExpensesScreen extends StatelessWidget {
                           Text(
                             expense['title'],
 
-                            style: const TextStyle(
+                            style: TextStyle(
+                              color: colorScheme.onSurface,
                               fontSize: 18,
 
                               fontWeight: FontWeight.bold,
@@ -82,7 +93,12 @@ class CloudExpensesScreen extends StatelessWidget {
 
                           const SizedBox(height: 4),
 
-                          Text(expense['category']),
+                          Text(
+                            expense['category'],
+                            style: TextStyle(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
                         ],
                       ),
                     ),

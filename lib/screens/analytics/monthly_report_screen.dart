@@ -23,6 +23,7 @@ class MonthlyReportScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final expenseProvider = Provider.of<ExpenseProvider>(context);
 
     final budgetProvider = Provider.of<BudgetProvider>(context);
@@ -60,10 +61,10 @@ class MonthlyReportScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F6FF),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       appBar: AppBar(
-        backgroundColor: Colors.white.withOpacity(0.85),
+        backgroundColor: colorScheme.surface.withValues(alpha: 0.85),
 
         elevation: 0,
 
@@ -86,14 +87,14 @@ class MonthlyReportScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
 
                 gradient: LinearGradient(
-                  colors: [Colors.white, Colors.white.withOpacity(0.92)],
+                  colors: [Colors.white, Colors.white.withValues(alpha: 0.92)],
                 ),
 
-                border: Border.all(color: Colors.white.withOpacity(0.7)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.7)),
 
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
+                    color: Colors.black.withValues(alpha: 0.04),
 
                     blurRadius: 14,
 
@@ -117,7 +118,7 @@ class MonthlyReportScreen extends StatelessWidget {
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
 
-            child: Container(color: Colors.white.withOpacity(0.72)),
+            child: Container(color: Colors.white.withValues(alpha: 0.72)),
           ),
         ),
 
@@ -131,7 +132,7 @@ class MonthlyReportScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
 
               decoration: BoxDecoration(
-                color: primary.withOpacity(0.08),
+                color: primary.withValues(alpha: 0.08),
 
                 borderRadius: BorderRadius.circular(30),
               ),

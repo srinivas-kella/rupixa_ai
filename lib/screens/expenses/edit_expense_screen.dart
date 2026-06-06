@@ -243,13 +243,15 @@ class _EditExpenseScreenState extends State<EditExpenseScreen>
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = colorScheme.brightness == Brightness.dark;
 
     final categoryColor = CategoryHelper.getCategoryColor(selectedCategory);
 
     final categoryIcon = CategoryHelper.getCategoryIcon(selectedCategory);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F5FF),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -266,19 +268,29 @@ class _EditExpenseScreenState extends State<EditExpenseScreen>
 
             fontWeight: FontWeight.bold,
 
-            color: const Color(0xFF15192D),
+            color: colorScheme.onSurface,
           ),
         ),
       ),
 
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
 
             end: Alignment.bottomCenter,
 
-            colors: [Color(0xFFF8FAFF), Color(0xFFF1F4FF), Color(0xFFF7F8FF)],
+            colors: isDark
+                ? const [
+                    Color(0xFF0E1320),
+                    Color(0xFF101623),
+                    Color(0xFF171C2C),
+                  ]
+                : const [
+                    Color(0xFFF8FAFF),
+                    Color(0xFFF1F4FF),
+                    Color(0xFFF7F8FF),
+                  ],
           ),
         ),
 
@@ -304,7 +316,7 @@ class _EditExpenseScreenState extends State<EditExpenseScreen>
 
                       fontWeight: FontWeight.bold,
 
-                      color: const Color(0xFF15192D),
+                      color: colorScheme.onSurface,
                     ),
                   ),
 
@@ -314,7 +326,7 @@ class _EditExpenseScreenState extends State<EditExpenseScreen>
                     "Edit and manage your financial records beautifully.",
 
                     style: GoogleFonts.poppins(
-                      color: Colors.grey.shade600,
+                      color: colorScheme.onSurfaceVariant,
 
                       fontSize: 15,
                     ),
@@ -580,7 +592,7 @@ class _EditExpenseScreenState extends State<EditExpenseScreen>
 
                       icon: const Icon(CupertinoIcons.chevron_down),
 
-                      style: GoogleFonts.poppins(color: Colors.black),
+                      style: GoogleFonts.poppins(color: colorScheme.onSurface),
 
                       items: CategoryHelper.categories.map((category) {
                         return DropdownMenuItem(

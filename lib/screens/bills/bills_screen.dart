@@ -244,7 +244,7 @@ class _BillsScreenState extends State<BillsScreen>
 
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.08),
+                        color: Colors.black.withValues(alpha: 0.08),
 
                         blurRadius: 30,
 
@@ -276,10 +276,10 @@ class _BillsScreenState extends State<BillsScreen>
 
                         decoration: BoxDecoration(
                           color: isPaid
-                              ? Colors.green.withOpacity(0.12)
+                              ? Colors.green.withValues(alpha: 0.12)
                               : isOverdue
-                              ? Colors.red.withOpacity(0.12)
-                              : primary.withOpacity(0.12),
+                              ? Colors.red.withValues(alpha: 0.12)
+                              : primary.withValues(alpha: 0.12),
 
                           borderRadius: BorderRadius.circular(30),
                         ),
@@ -329,10 +329,10 @@ class _BillsScreenState extends State<BillsScreen>
 
                         decoration: BoxDecoration(
                           color: isPaid
-                              ? Colors.green.withOpacity(0.10)
+                              ? Colors.green.withValues(alpha: 0.10)
                               : isOverdue
-                              ? Colors.red.withOpacity(0.10)
-                              : primary.withOpacity(0.10),
+                              ? Colors.red.withValues(alpha: 0.10)
+                              : primary.withValues(alpha: 0.10),
 
                           borderRadius: BorderRadius.circular(16),
                         ),
@@ -512,8 +512,11 @@ class _BillsScreenState extends State<BillsScreen>
           !bill.isPaid;
     }).toList();
 
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = colorScheme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F6FF),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       // appBar: AppBar(
       //   toolbarHeight: 80,
@@ -610,7 +613,7 @@ class _BillsScreenState extends State<BillsScreen>
 
                 expandedHeight: 110,
 
-                backgroundColor: Colors.white.withOpacity(0.82),
+                backgroundColor: colorScheme.surface.withValues(alpha: 0.82),
 
                 surfaceTintColor: Colors.transparent,
 
@@ -635,7 +638,7 @@ class _BillsScreenState extends State<BillsScreen>
 
                               fontWeight: FontWeight.w700,
 
-                              color: Colors.black,
+                              color: colorScheme.onSurface,
                             ),
                           ),
 
@@ -643,7 +646,7 @@ class _BillsScreenState extends State<BillsScreen>
                             "Manage your payments",
 
                             style: GoogleFonts.poppins(
-                              color: Colors.grey.shade600,
+                              color: colorScheme.onSurfaceVariant,
 
                               fontSize: 12,
                             ),
@@ -682,13 +685,15 @@ class _BillsScreenState extends State<BillsScreen>
 
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: colorScheme.surface,
 
                             borderRadius: BorderRadius.circular(26),
 
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.04),
+                                color: Colors.black.withValues(
+                                  alpha: isDark ? 0.18 : 0.04,
+                                ),
 
                                 blurRadius: 16,
 
@@ -699,6 +704,10 @@ class _BillsScreenState extends State<BillsScreen>
 
                           child: TextField(
                             controller: _searchController,
+
+                            style: GoogleFonts.poppins(
+                              color: colorScheme.onSurface,
+                            ),
 
                             onChanged: (value) {
                               _searchNotifier.value = value;
@@ -716,7 +725,7 @@ class _BillsScreenState extends State<BillsScreen>
                               hintText: "Search bills...",
 
                               hintStyle: GoogleFonts.poppins(
-                                color: Colors.grey,
+                                color: colorScheme.onSurfaceVariant,
                               ),
                             ),
                           ),
@@ -798,7 +807,7 @@ class _BillsScreenState extends State<BillsScreen>
 
                             boxShadow: [
                               BoxShadow(
-                                color: primary.withOpacity(0.35),
+                                color: primary.withValues(alpha: 0.35),
 
                                 blurRadius: 28,
 
@@ -846,7 +855,7 @@ class _BillsScreenState extends State<BillsScreen>
 
                                 borderRadius: BorderRadius.circular(30),
 
-                                backgroundColor: Colors.white.withOpacity(0.14),
+                                backgroundColor: Colors.white.withValues(alpha: 0.14),
 
                                 valueColor: const AlwaysStoppedAnimation(
                                   Colors.white,
@@ -906,14 +915,14 @@ class _BillsScreenState extends State<BillsScreen>
                                         )
                                       : null,
 
-                                  color: selected ? null : Colors.white,
+                                  color: selected ? null : colorScheme.surface,
 
                                   borderRadius: BorderRadius.circular(18),
 
                                   boxShadow: selected
                                       ? [
                                           BoxShadow(
-                                            color: primary.withOpacity(0.25),
+                                            color: primary.withValues(alpha: 0.25),
 
                                             blurRadius: 18,
 
@@ -930,7 +939,7 @@ class _BillsScreenState extends State<BillsScreen>
                                     style: GoogleFonts.poppins(
                                       color: selected
                                           ? Colors.white
-                                          : Colors.black87,
+                                          : colorScheme.onSurface,
 
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -1035,7 +1044,7 @@ class _BillsScreenState extends State<BillsScreen>
 
                     boxShadow: [
                       BoxShadow(
-                        color: primary.withOpacity(0.40),
+                        color: primary.withValues(alpha: 0.40),
 
                         blurRadius: 28,
 
@@ -1086,11 +1095,11 @@ class _BillsScreenState extends State<BillsScreen>
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
 
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.14),
+        color: Colors.white.withValues(alpha: 0.14),
 
         borderRadius: BorderRadius.circular(24),
 
-        border: Border.all(color: Colors.white.withOpacity(0.12)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
       ),
 
       child: Row(
@@ -1099,7 +1108,7 @@ class _BillsScreenState extends State<BillsScreen>
             padding: const EdgeInsets.all(12),
 
             decoration: BoxDecoration(
-              color: color.withOpacity(0.20),
+              color: color.withValues(alpha: 0.20),
 
               borderRadius: BorderRadius.circular(16),
             ),
@@ -1169,7 +1178,7 @@ class _BillsScreenState extends State<BillsScreen>
 
         boxShadow: [
           BoxShadow(
-            color: gradient.first.withOpacity(0.28),
+            color: gradient.first.withValues(alpha: 0.28),
 
             blurRadius: 20,
 
@@ -1184,7 +1193,7 @@ class _BillsScreenState extends State<BillsScreen>
             padding: const EdgeInsets.all(11),
 
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.18),
+              color: Colors.white.withValues(alpha: 0.18),
 
               borderRadius: BorderRadius.circular(16),
             ),
@@ -1239,6 +1248,8 @@ class _BillsScreenState extends State<BillsScreen>
   }
 
   Widget _buildBillCard(dynamic bill, int index) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = colorScheme.brightness == Brightness.dark;
     final bool isPaid = bill.isPaid;
 
     final bool isOverdue = !isPaid && bill.dueDate.isBefore(DateTime.now());
@@ -1340,19 +1351,21 @@ class _BillsScreenState extends State<BillsScreen>
           padding: const EdgeInsets.all(20),
 
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Colors.white, Color(0xFFF8F9FF)],
+            gradient: LinearGradient(
+              colors: isDark
+                  ? [colorScheme.surface, const Color(0xFF171C2C)]
+                  : const [Colors.white, Color(0xFFF8F9FF)],
             ),
 
             borderRadius: BorderRadius.circular(32),
 
             border: isOverdue
-                ? Border.all(color: Colors.red.withOpacity(0.25), width: 1.2)
+                ? Border.all(color: Colors.red.withValues(alpha: 0.25), width: 1.2)
                 : null,
 
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.04),
+                color: Colors.black.withValues(alpha: isDark ? 0.18 : 0.04),
 
                 blurRadius: 18,
 
@@ -1368,10 +1381,10 @@ class _BillsScreenState extends State<BillsScreen>
 
                 decoration: BoxDecoration(
                   color: isPaid
-                      ? Colors.green.withOpacity(0.12)
+                      ? Colors.green.withValues(alpha: 0.12)
                       : isOverdue
-                      ? Colors.red.withOpacity(0.12)
-                      : primary.withOpacity(0.12),
+                      ? Colors.red.withValues(alpha: 0.12)
+                      : primary.withValues(alpha: 0.12),
 
                   borderRadius: BorderRadius.circular(24),
                 ),
@@ -1408,6 +1421,7 @@ class _BillsScreenState extends State<BillsScreen>
                       overflow: TextOverflow.ellipsis,
 
                       style: GoogleFonts.poppins(
+                        color: colorScheme.onSurface,
                         fontSize: 18,
 
                         fontWeight: FontWeight.w600,
@@ -1431,10 +1445,10 @@ class _BillsScreenState extends State<BillsScreen>
 
                           decoration: BoxDecoration(
                             color: isPaid
-                                ? Colors.green.withOpacity(0.10)
+                                ? Colors.green.withValues(alpha: 0.10)
                                 : isOverdue
-                                ? Colors.red.withOpacity(0.10)
-                                : primary.withOpacity(0.10),
+                                ? Colors.red.withValues(alpha: 0.10)
+                                : primary.withValues(alpha: 0.10),
 
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -1464,7 +1478,7 @@ class _BillsScreenState extends State<BillsScreen>
                           "${bill.dueDate.day}/${bill.dueDate.month}/${bill.dueDate.year}",
 
                           style: GoogleFonts.poppins(
-                            color: Colors.grey.shade500,
+                            color: colorScheme.onSurfaceVariant,
 
                             fontSize: 11,
                           ),
@@ -1485,7 +1499,7 @@ class _BillsScreenState extends State<BillsScreen>
                     "₹ ${bill.amount.toStringAsFixed(0)}",
 
                     style: GoogleFonts.poppins(
-                      color: Colors.black87,
+                      color: colorScheme.onSurface,
 
                       fontWeight: FontWeight.w700,
 
@@ -1500,7 +1514,7 @@ class _BillsScreenState extends State<BillsScreen>
 
                     size: 14,
 
-                    color: Colors.grey.shade400,
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ],
               ),
@@ -1568,7 +1582,7 @@ class _BillsScreenState extends State<BillsScreen>
       padding: const EdgeInsets.symmetric(vertical: 18),
 
       decoration: BoxDecoration(
-        color: color.withOpacity(0.10),
+        color: color.withValues(alpha: 0.10),
 
         borderRadius: BorderRadius.circular(24),
       ),

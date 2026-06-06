@@ -155,6 +155,9 @@ class _ExpensesScreenState extends State<ExpensesScreen>
       isScrollControlled: true,
 
       builder: (_) {
+        final colorScheme = Theme.of(context).colorScheme;
+        final isDark = colorScheme.brightness == Brightness.dark;
+
         return StatefulBuilder(
           builder: (context, setModalState) {
             return BackdropFilter(
@@ -177,19 +180,23 @@ class _ExpensesScreenState extends State<ExpensesScreen>
                       padding: const EdgeInsets.all(24),
 
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
+                        gradient: LinearGradient(
                           begin: Alignment.topLeft,
 
                           end: Alignment.bottomRight,
 
-                          colors: [Colors.white, Color(0xFFF8F9FF)],
+                          colors: isDark
+                              ? [colorScheme.surface, const Color(0xFF171C2C)]
+                              : const [Colors.white, Color(0xFFF8F9FF)],
                         ),
 
                         borderRadius: BorderRadius.circular(36),
 
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.08),
+                            color: Colors.black.withValues(
+                              alpha: isDark ? 0.22 : 0.08,
+                            ),
 
                             blurRadius: 30,
 
@@ -208,7 +215,7 @@ class _ExpensesScreenState extends State<ExpensesScreen>
                             height: 5,
 
                             decoration: BoxDecoration(
-                              color: Colors.grey.shade300,
+                              color: colorScheme.outlineVariant,
 
                               borderRadius: BorderRadius.circular(20),
                             ),
@@ -220,7 +227,7 @@ class _ExpensesScreenState extends State<ExpensesScreen>
                             padding: const EdgeInsets.all(22),
 
                             decoration: BoxDecoration(
-                              color: color.withOpacity(0.12),
+                              color: color.withValues(alpha: 0.12),
 
                               borderRadius: BorderRadius.circular(28),
                             ),
@@ -240,6 +247,7 @@ class _ExpensesScreenState extends State<ExpensesScreen>
                             textAlign: TextAlign.center,
 
                             style: GoogleFonts.poppins(
+                              color: colorScheme.onSurface,
                               fontSize: 26,
 
                               fontWeight: FontWeight.bold,
@@ -255,7 +263,7 @@ class _ExpensesScreenState extends State<ExpensesScreen>
                             ),
 
                             decoration: BoxDecoration(
-                              color: color.withOpacity(0.10),
+                              color: color.withValues(alpha: 0.10),
 
                               borderRadius: BorderRadius.circular(16),
                             ),
@@ -277,6 +285,7 @@ class _ExpensesScreenState extends State<ExpensesScreen>
                             "₹ ${expense['amount']}",
 
                             style: GoogleFonts.poppins(
+                              color: colorScheme.onSurface,
                               fontSize: 42,
 
                               fontWeight: FontWeight.w700,
@@ -372,8 +381,11 @@ class _ExpensesScreenState extends State<ExpensesScreen>
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = colorScheme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F6FF),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
 
@@ -426,7 +438,7 @@ class _ExpensesScreenState extends State<ExpensesScreen>
 
                     boxShadow: [
                       BoxShadow(
-                        color: primary.withOpacity(0.40),
+                        color: primary.withValues(alpha: 0.40),
 
                         blurRadius: 28,
 
@@ -498,7 +510,7 @@ class _ExpensesScreenState extends State<ExpensesScreen>
 
                     expandedHeight: 170,
 
-                    backgroundColor: const Color(0xFFF4F6FF),
+                    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
                     elevation: 0,
 
@@ -511,7 +523,7 @@ class _ExpensesScreenState extends State<ExpensesScreen>
                         "Expenses",
 
                         style: GoogleFonts.poppins(
-                          color: Colors.black,
+                          color: colorScheme.onSurface,
 
                           fontWeight: FontWeight.bold,
 
@@ -520,13 +532,15 @@ class _ExpensesScreenState extends State<ExpensesScreen>
                       ),
 
                       background: Container(
-                        decoration: const BoxDecoration(
+                        decoration: BoxDecoration(
                           gradient: LinearGradient(
                             begin: Alignment.topCenter,
 
                             end: Alignment.bottomCenter,
 
-                            colors: [Color(0xFFF8FAFF), Color(0xFFF4F6FF)],
+                            colors: isDark
+                                ? const [Color(0xFF0E1320), Color(0xFF101623)]
+                                : const [Color(0xFFF8FAFF), Color(0xFFF4F6FF)],
                           ),
                         ),
                       ),
@@ -563,7 +577,7 @@ class _ExpensesScreenState extends State<ExpensesScreen>
 
                               boxShadow: [
                                 BoxShadow(
-                                  color: primary.withOpacity(0.35),
+                                  color: primary.withValues(alpha: 0.35),
 
                                   blurRadius: 28,
 
@@ -641,13 +655,15 @@ class _ExpensesScreenState extends State<ExpensesScreen>
                             padding: const EdgeInsets.symmetric(horizontal: 18),
 
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: colorScheme.surface,
 
                               borderRadius: BorderRadius.circular(26),
 
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.04),
+                                  color: Colors.black.withValues(
+                                    alpha: isDark ? 0.18 : 0.04,
+                                  ),
 
                                   blurRadius: 14,
 
@@ -663,7 +679,9 @@ class _ExpensesScreenState extends State<ExpensesScreen>
                                 _searchNotifier.value = value;
                               },
 
-                              style: GoogleFonts.poppins(),
+                              style: GoogleFonts.poppins(
+                                color: colorScheme.onSurface,
+                              ),
 
                               decoration: InputDecoration(
                                 border: InputBorder.none,
@@ -677,7 +695,7 @@ class _ExpensesScreenState extends State<ExpensesScreen>
                                 hintText: "Search expenses...",
 
                                 hintStyle: GoogleFonts.poppins(
-                                  color: Colors.grey,
+                                  color: colorScheme.onSurfaceVariant,
                                 ),
                               ),
                             ),
@@ -722,15 +740,17 @@ class _ExpensesScreenState extends State<ExpensesScreen>
                                             )
                                           : null,
 
-                                      color: selected ? null : Colors.white,
+                                      color: selected
+                                          ? null
+                                          : colorScheme.surface,
 
                                       borderRadius: BorderRadius.circular(18),
 
                                       boxShadow: selected
                                           ? [
                                               BoxShadow(
-                                                color: primary.withOpacity(
-                                                  0.25,
+                                                color: primary.withValues(
+                                                  alpha: 0.25,
                                                 ),
 
                                                 blurRadius: 16,
@@ -748,7 +768,7 @@ class _ExpensesScreenState extends State<ExpensesScreen>
                                         style: GoogleFonts.poppins(
                                           color: selected
                                               ? Colors.white
-                                              : Colors.black87,
+                                              : colorScheme.onSurface,
 
                                           fontWeight: FontWeight.w600,
                                         ),
@@ -783,8 +803,8 @@ class _ExpensesScreenState extends State<ExpensesScreen>
                                       decoration: BoxDecoration(
                                         gradient: LinearGradient(
                                           colors: [
-                                            primary.withOpacity(0.15),
-                                            secondary.withOpacity(0.10),
+                                            primary.withValues(alpha: 0.15),
+                                            secondary.withValues(alpha: 0.10),
                                           ],
                                         ),
 
@@ -806,6 +826,7 @@ class _ExpensesScreenState extends State<ExpensesScreen>
                                       "No Expenses Found",
 
                                       style: GoogleFonts.poppins(
+                                        color: colorScheme.onSurface,
                                         fontSize: 22,
 
                                         fontWeight: FontWeight.w700,
@@ -820,7 +841,7 @@ class _ExpensesScreenState extends State<ExpensesScreen>
                                       textAlign: TextAlign.center,
 
                                       style: GoogleFonts.poppins(
-                                        color: Colors.grey.shade600,
+                                        color: colorScheme.onSurfaceVariant,
                                       ),
                                     ),
                                   ],
@@ -904,19 +925,24 @@ class _ExpensesScreenState extends State<ExpensesScreen>
                                       padding: const EdgeInsets.all(20),
 
                                       decoration: BoxDecoration(
-                                        gradient: const LinearGradient(
-                                          colors: [
-                                            Colors.white,
-                                            Color(0xFFF8F9FF),
-                                          ],
+                                        gradient: LinearGradient(
+                                          colors: isDark
+                                              ? [
+                                                  colorScheme.surface,
+                                                  const Color(0xFF171C2C),
+                                                ]
+                                              : const [
+                                                  Colors.white,
+                                                  Color(0xFFF8F9FF),
+                                                ],
                                         ),
 
                                         borderRadius: BorderRadius.circular(30),
 
                                         boxShadow: [
                                           BoxShadow(
-                                            color: Colors.black.withOpacity(
-                                              0.04,
+                                            color: Colors.black.withValues(
+                                              alpha: isDark ? 0.18 : 0.04,
                                             ),
 
                                             blurRadius: 16,
@@ -932,7 +958,7 @@ class _ExpensesScreenState extends State<ExpensesScreen>
                                             padding: const EdgeInsets.all(16),
 
                                             decoration: BoxDecoration(
-                                              color: color.withOpacity(0.12),
+                                              color: color.withValues(alpha: 0.12),
 
                                               borderRadius:
                                                   BorderRadius.circular(22),
@@ -964,6 +990,8 @@ class _ExpensesScreenState extends State<ExpensesScreen>
                                                       TextOverflow.ellipsis,
 
                                                   style: GoogleFonts.poppins(
+                                                    color:
+                                                        colorScheme.onSurface,
                                                     fontSize: 18,
 
                                                     fontWeight: FontWeight.w600,
@@ -988,7 +1016,7 @@ class _ExpensesScreenState extends State<ExpensesScreen>
 
                                                       decoration: BoxDecoration(
                                                         color: color
-                                                            .withOpacity(0.10),
+                                                            .withValues(alpha: 0.10),
 
                                                         borderRadius:
                                                             BorderRadius.circular(
@@ -1015,14 +1043,12 @@ class _ExpensesScreenState extends State<ExpensesScreen>
                                                     Text(
                                                       "Today",
 
-                                                      style:
-                                                          GoogleFonts.poppins(
-                                                            color: Colors
-                                                                .grey
-                                                                .shade500,
+                                                      style: GoogleFonts.poppins(
+                                                        color: colorScheme
+                                                            .onSurfaceVariant,
 
-                                                            fontSize: 11,
-                                                          ),
+                                                        fontSize: 11,
+                                                      ),
                                                     ),
                                                   ],
                                                 ),
@@ -1041,7 +1067,7 @@ class _ExpensesScreenState extends State<ExpensesScreen>
                                                 "₹ ${expense['amount']}",
 
                                                 style: GoogleFonts.poppins(
-                                                  color: Colors.black87,
+                                                  color: colorScheme.onSurface,
 
                                                   fontWeight: FontWeight.w700,
 
@@ -1056,7 +1082,8 @@ class _ExpensesScreenState extends State<ExpensesScreen>
 
                                                 size: 14,
 
-                                                color: Colors.grey.shade400,
+                                                color: colorScheme
+                                                    .onSurfaceVariant,
                                               ),
                                             ],
                                           ),
@@ -1094,7 +1121,7 @@ class _ExpensesScreenState extends State<ExpensesScreen>
       padding: const EdgeInsets.all(18),
 
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.12),
+        color: Colors.white.withValues(alpha: 0.12),
 
         borderRadius: BorderRadius.circular(22),
       ),
@@ -1105,7 +1132,7 @@ class _ExpensesScreenState extends State<ExpensesScreen>
             padding: const EdgeInsets.all(12),
 
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
+              color: Colors.white.withValues(alpha: 0.15),
 
               borderRadius: BorderRadius.circular(18),
             ),

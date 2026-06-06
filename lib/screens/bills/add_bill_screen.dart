@@ -401,12 +401,14 @@ class _AddBillScreenState extends State<AddBillScreen>
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = colorScheme.brightness == Brightness.dark;
     final selectedItem = categories.firstWhere(
       (item) => item['title'] == selectedCategory,
     );
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F6FF),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -421,7 +423,7 @@ class _AddBillScreenState extends State<AddBillScreen>
           style: GoogleFonts.poppins(
             fontWeight: FontWeight.w700,
 
-            color: Colors.black,
+            color: colorScheme.onSurface,
 
             fontSize: 30,
           ),
@@ -429,13 +431,23 @@ class _AddBillScreenState extends State<AddBillScreen>
       ),
 
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
 
             end: Alignment.bottomCenter,
 
-            colors: [Color(0xFFF8FAFF), Color(0xFFF1F4FF), Color(0xFFF7F8FF)],
+            colors: isDark
+                ? const [
+                    Color(0xFF0E1320),
+                    Color(0xFF101623),
+                    Color(0xFF171C2C),
+                  ]
+                : const [
+                    Color(0xFFF8FAFF),
+                    Color(0xFFF1F4FF),
+                    Color(0xFFF7F8FF),
+                  ],
           ),
         ),
 
@@ -457,6 +469,7 @@ class _AddBillScreenState extends State<AddBillScreen>
                     "Manage Bill Payments",
 
                     style: GoogleFonts.poppins(
+                      color: colorScheme.onSurface,
                       fontSize: 34,
 
                       fontWeight: FontWeight.bold,
@@ -469,7 +482,7 @@ class _AddBillScreenState extends State<AddBillScreen>
                     "Track reminders and avoid late payments beautifully.",
 
                     style: GoogleFonts.poppins(
-                      color: Colors.grey.shade600,
+                      color: colorScheme.onSurfaceVariant,
 
                       fontSize: 15,
                     ),
@@ -888,7 +901,9 @@ class _AddBillScreenState extends State<AddBillScreen>
 
                                           decoration: BoxDecoration(
                                             color: selected
-                                                ? Colors.white.withValues(alpha: 0.18)
+                                                ? Colors.white.withValues(
+                                                    alpha: 0.18,
+                                                  )
                                                 : item['color'].withOpacity(
                                                     0.10,
                                                   ),

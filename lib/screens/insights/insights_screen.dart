@@ -11,6 +11,7 @@ class InsightsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final expenses = Provider.of<ExpenseProvider>(context).expenses;
 
     final budget = Provider.of<BudgetProvider>(context).monthlyBudget;
@@ -28,7 +29,7 @@ class InsightsScreen extends StatelessWidget {
     );
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F7FC),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       appBar: AppBar(title: const Text('Smart Insights')),
 
@@ -44,19 +45,30 @@ class InsightsScreen extends StatelessWidget {
             padding: const EdgeInsets.all(20),
 
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: colorScheme.surface,
 
               borderRadius: BorderRadius.circular(22),
 
-              boxShadow: const [
-                BoxShadow(color: Colors.black12, blurRadius: 6),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(
+                    alpha: colorScheme.brightness == Brightness.dark
+                        ? 0.18
+                        : 0.08,
+                  ),
+                  blurRadius: 10,
+                ),
               ],
             ),
 
             child: Text(
               insights[index],
 
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+              style: TextStyle(
+                color: colorScheme.onSurface,
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           );
         },

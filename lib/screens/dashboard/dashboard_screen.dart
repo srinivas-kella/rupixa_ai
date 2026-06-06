@@ -166,18 +166,30 @@ class _DashboardScreenState extends State<DashboardScreen>
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = colorScheme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFEEF3FF),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
 
             end: Alignment.bottomCenter,
 
-            colors: [Color(0xFFF8FAFF), Color(0xFFEFF2FF), Color(0xFFF5F7FF)],
+            colors: isDark
+                ? const [
+                    Color(0xFF0E1320),
+                    Color(0xFF101623),
+                    Color(0xFF171C2C),
+                  ]
+                : const [
+                    Color(0xFFF8FAFF),
+                    Color(0xFFEFF2FF),
+                    Color(0xFFF5F7FF),
+                  ],
           ),
         ),
 
@@ -251,7 +263,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                               return Container(
                                 decoration: BoxDecoration(
                                   color: collapsed
-                                      ? Colors.white.withOpacity(0.90)
+                                      ? colorScheme.surface.withValues(
+                                          alpha: 0.90,
+                                        )
                                       : Colors.transparent,
                                 ),
 
@@ -307,8 +321,8 @@ class _DashboardScreenState extends State<DashboardScreen>
 
                                                           decoration: BoxDecoration(
                                                             color: primary
-                                                                .withOpacity(
-                                                                  0.08,
+                                                                .withValues(
+                                                                  alpha: 0.08,
                                                                 ),
 
                                                             borderRadius:
@@ -409,25 +423,25 @@ class _DashboardScreenState extends State<DashboardScreen>
 
                                                   gradient: LinearGradient(
                                                     colors: [
-                                                      Colors.white,
-                                                      Colors.white.withOpacity(
-                                                        0.92,
-                                                      ),
+                                                      colorScheme.surface,
+                                                      colorScheme.surface
+                                                          .withValues(
+                                                            alpha: 0.92,
+                                                          ),
                                                     ],
                                                   ),
 
                                                   border: Border.all(
-                                                    color: Colors.white
-                                                        .withOpacity(0.7),
+                                                    color: colorScheme
+                                                        .outlineVariant
+                                                        .withValues(alpha: 0.5),
                                                   ),
                                                 ),
 
                                                 child: Icon(
                                                   CupertinoIcons.bell_fill,
                                                   size: collapsed ? 18 : 20,
-                                                  color: const Color(
-                                                    0xFF15192D,
-                                                  ),
+                                                  color: colorScheme.onSurface,
                                                 ),
                                               ),
 
@@ -449,16 +463,18 @@ class _DashboardScreenState extends State<DashboardScreen>
 
                                                   gradient: LinearGradient(
                                                     colors: [
-                                                      Colors.white,
-                                                      Colors.white.withOpacity(
-                                                        0.92,
-                                                      ),
+                                                      colorScheme.surface,
+                                                      colorScheme.surface
+                                                          .withValues(
+                                                            alpha: 0.92,
+                                                          ),
                                                     ],
                                                   ),
 
                                                   border: Border.all(
-                                                    color: Colors.white
-                                                        .withOpacity(0.7),
+                                                    color: colorScheme
+                                                        .outlineVariant
+                                                        .withValues(alpha: 0.5),
                                                   ),
                                                 ),
 
@@ -466,9 +482,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                                   CupertinoIcons
                                                       .person_crop_circle_fill,
                                                   size: collapsed ? 18 : 20,
-                                                  color: const Color(
-                                                    0xFF15192D,
-                                                  ),
+                                                  color: colorScheme.onSurface,
                                                 ),
                                               ),
                                             ],
@@ -1024,8 +1038,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                                         decoration: BoxDecoration(
                                           gradient: LinearGradient(
                                             colors: [
-                                              primary.withOpacity(0.12),
-                                              secondary.withOpacity(0.08),
+                                              primary.withValues(alpha: 0.12),
+                                              secondary.withValues(alpha: 0.08),
                                             ],
                                           ),
 
@@ -1131,10 +1145,15 @@ class _DashboardScreenState extends State<DashboardScreen>
 
                                     decoration: BoxDecoration(
                                       gradient: LinearGradient(
-                                        colors: [
-                                          Colors.white,
-                                          const Color(0xFFF7F8FF),
-                                        ],
+                                        colors: isDark
+                                            ? [
+                                                colorScheme.surface,
+                                                const Color(0xFF171C2C),
+                                              ]
+                                            : [
+                                                Colors.white,
+                                                const Color(0xFFF7F8FF),
+                                              ],
                                       ),
 
                                       borderRadius: BorderRadius.circular(30),
@@ -1195,6 +1214,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                                 overflow: TextOverflow.ellipsis,
 
                                                 style: GoogleFonts.poppins(
+                                                  color: colorScheme.onSurface,
                                                   fontSize: 16,
 
                                                   fontWeight: FontWeight.w700,
@@ -1268,11 +1288,20 @@ class _DashboardScreenState extends State<DashboardScreen>
                                                   ),
 
                                               decoration: BoxDecoration(
-                                                gradient: const LinearGradient(
-                                                  colors: [
-                                                    Color(0xFFE9FFF0),
-                                                    Color(0xFFD6FFE3),
-                                                  ],
+                                                gradient: LinearGradient(
+                                                  colors: isDark
+                                                      ? [
+                                                          const Color(
+                                                            0xFF123524,
+                                                          ),
+                                                          const Color(
+                                                            0xFF16452E,
+                                                          ),
+                                                        ]
+                                                      : const [
+                                                          Color(0xFFE9FFF0),
+                                                          Color(0xFFD6FFE3),
+                                                        ],
                                                 ),
 
                                                 borderRadius:
@@ -1318,6 +1347,8 @@ class _DashboardScreenState extends State<DashboardScreen>
   /// =========================================
 
   Widget _buildEmptyState() {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
 
@@ -1355,6 +1386,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               "No Expenses Yet",
 
               style: GoogleFonts.poppins(
+                color: colorScheme.onSurface,
                 fontSize: 28,
 
                 fontWeight: FontWeight.bold,
@@ -1369,7 +1401,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               textAlign: TextAlign.center,
 
               style: GoogleFonts.poppins(
-                color: Colors.grey.shade600,
+                color: colorScheme.onSurfaceVariant,
 
                 height: 1.6,
 
@@ -1388,7 +1420,7 @@ class _DashboardScreenState extends State<DashboardScreen>
       width: 36,
 
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.85),
+        color: Colors.white.withValues(alpha: 0.85),
 
         borderRadius: BorderRadius.circular(12),
       ),
@@ -1418,7 +1450,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 ),
 
                 decoration: BoxDecoration(
-                  color: primary.withOpacity(0.08),
+                  color: primary.withValues(alpha: 0.08),
 
                   borderRadius: BorderRadius.circular(30),
                 ),
@@ -1496,14 +1528,14 @@ class _DashboardScreenState extends State<DashboardScreen>
           borderRadius: BorderRadius.circular(16),
 
           gradient: LinearGradient(
-            colors: [Colors.white, Colors.white.withOpacity(0.92)],
+            colors: [Colors.white, Colors.white.withValues(alpha: 0.92)],
           ),
 
-          border: Border.all(color: Colors.white.withOpacity(0.7)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.7)),
 
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.04),
 
               blurRadius: 14,
 

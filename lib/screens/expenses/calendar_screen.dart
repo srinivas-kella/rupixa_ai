@@ -16,6 +16,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final expenseProvider = Provider.of<ExpenseProvider>(context);
 
     final expenses = expenseProvider.expenses.where((expense) {
@@ -25,7 +26,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     }).toList();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F7FC),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       appBar: AppBar(title: const Text('Expense Calendar')),
 
@@ -35,7 +36,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             margin: const EdgeInsets.all(16),
 
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: colorScheme.surface,
 
               borderRadius: BorderRadius.circular(24),
             ),
@@ -69,7 +70,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
           Expanded(
             child: expenses.isEmpty
-                ? const Center(child: Text('No expenses for this day'))
+                ? Center(
+                    child: Text(
+                      'No expenses for this day',
+                      style: TextStyle(color: colorScheme.onSurface),
+                    ),
+                  )
                 : ListView.builder(
                     padding: const EdgeInsets.all(16),
 
@@ -84,12 +90,15 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         padding: const EdgeInsets.all(18),
 
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: colorScheme.surface,
 
                           borderRadius: BorderRadius.circular(20),
 
-                          boxShadow: const [
-                            BoxShadow(color: Colors.black12, blurRadius: 6),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.08),
+                              blurRadius: 6,
+                            ),
                           ],
                         ),
 

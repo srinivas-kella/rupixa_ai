@@ -1,9 +1,9 @@
 import 'dart:async';
+import 'dart:math' as math;
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lottie/lottie.dart';
 
 import '../../routes/app_routes.dart';
 
@@ -15,9 +15,14 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
+
+  late AnimationController _rotateController;
+  late AnimationController _pulseController;
+
+  late Animation<double> _pulseAnimation;
 
   String _loadingText = "Loading smart categories...";
   double _progress = 0.0;
@@ -28,7 +33,10 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
 
-    // Smooth fade animation
+    /// =========================
+    /// FADE ANIMATION
+    /// =========================
+
     _fadeController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1400),
@@ -41,10 +49,39 @@ class _SplashScreenState extends State<SplashScreen>
 
     _fadeController.forward();
 
+    /// =========================
+    /// ROTATING ANIMATION
+    /// =========================
+
+    _rotateController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 8),
+    )..repeat();
+
+    /// =========================
+    /// PULSE ANIMATION
+    /// =========================
+
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1800),
+    )..repeat(reverse: true);
+
+    _pulseAnimation = Tween<double>(begin: 0.95, end: 1.05).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+
+    /// =========================
+    /// LOADING SIMULATION
+    /// =========================
+
     _simulateLoading();
 
-    // Navigate after splash
-    Future.delayed(const Duration(milliseconds: 3800), () {
+    /// =========================
+    /// NAVIGATION
+    /// =========================
+
+    Future.delayed(const Duration(milliseconds: 4000), () {
       if (!mounted) return;
 
       final user = FirebaseAuth.instance.currentUser;
@@ -56,7 +93,7 @@ class _SplashScreenState extends State<SplashScreen>
   void _simulateLoading() {
     int step = 0;
 
-    _progressTimer = Timer.periodic(const Duration(milliseconds: 300), (timer) {
+    _progressTimer = Timer.periodic(const Duration(milliseconds: 320), (timer) {
       if (!mounted) {
         timer.cancel();
         return;
@@ -88,233 +125,394 @@ class _SplashScreenState extends State<SplashScreen>
     });
   }
 
+  Widget _buildFloatingDot({required double size, required Color color}) {
+    return Container(
+      height: size,
+      width: size,
+
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+
+        color: color,
+
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: 0.45),
+            blurRadius: 14,
+            spreadRadius: 2,
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _fadeController.dispose();
+    _rotateController.dispose();
+    _pulseController.dispose();
+
     _progressTimer?.cancel();
+
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = colorScheme.brightness == Brightness.dark;
+    final compact = size.height < 760;
+    final animationHeight = (size.height * (compact ? 0.28 : 0.36)).clamp(
+      210.0,
+      330.0,
+    );
+    final outerSize = compact ? 230.0 : 280.0;
+    final ringSize = compact ? 190.0 : 230.0;
+    final innerSize = compact ? 168.0 : 205.0;
+    final iconSize = compact ? 108.0 : 135.0;
 
     return Scaffold(
       body: Container(
         width: double.infinity,
         height: double.infinity,
 
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
 
-            colors: [Color(0xFFF8F7FF), Color(0xFFEDE9FF), Color(0xFFFDFDFE)],
+            colors: isDark
+                ? const [
+                    Color(0xFF0E1320),
+                    Color(0xFF171C2C),
+                    Color(0xFF101623),
+                  ]
+                : const [
+                    Color(0xFFF8F7FF),
+                    Color(0xFFEDE9FF),
+                    Color(0xFFFDFDFE),
+                  ],
           ),
         ),
 
         child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              /// =========================
-              /// PREMIUM ANIMATION AREA
-              /// =========================
-              SizedBox(
-                height: size.height * 0.38,
-                width: size.width,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                physics: const ClampingScrollPhysics(),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
 
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    /// BIG GLOW
-                    Container(
-                      height: 260,
-                      width: 260,
+                    children: [
+                      /// =========================
+                      /// PREMIUM CUSTOM ANIMATION
+                      /// =========================
+                      AnimatedBuilder(
+                        animation: _rotateController,
 
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
+                        builder: (context, child) {
+                          return ScaleTransition(
+                            scale: _pulseAnimation,
 
-                        gradient: RadialGradient(
-                          colors: [
-                            const Color(0xFF7B61FF).withValues(alpha: 0.22),
+                            child: SizedBox(
+                              height: animationHeight,
+                              width: size.width,
 
-                            const Color(0xFF9D8CFF).withValues(alpha: 0.12),
+                              child: Stack(
+                                alignment: Alignment.center,
 
-                            Colors.transparent,
-                          ],
-                        ),
-                      ),
-                    ),
+                                children: [
+                                  /// OUTER GLOW
+                                  Container(
+                                    height: outerSize,
+                                    width: outerSize,
 
-                    /// GLASS CONTAINER
-                    Container(
-                      height: 230,
-                      width: 230,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
 
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(40),
+                                      gradient: RadialGradient(
+                                        colors: [
+                                          const Color(
+                                            0xFF7B61FF,
+                                          ).withValues(alpha: 0.18),
 
-                        color: Colors.white.withValues(alpha: 0.55),
+                                          const Color(
+                                            0xFF9D8CFF,
+                                          ).withValues(alpha: 0.10),
 
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.7),
-                          width: 1.5,
-                        ),
+                                          Colors.transparent,
+                                        ],
+                                      ),
+                                    ),
+                                  ),
 
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.deepPurple.withValues(alpha: 0.10),
-                            blurRadius: 40,
-                            spreadRadius: 8,
-                            offset: const Offset(0, 20),
-                          ),
-                        ],
-                      ),
-                    ),
+                                  /// ROTATING RING
+                                  Transform.rotate(
+                                    angle:
+                                        _rotateController.value * 2 * math.pi,
 
-                    /// LOTTIE
-                    Lottie.asset(
-                      'assets/animations/finance_wallet.json',
+                                    child: Container(
+                                      height: ringSize,
+                                      width: ringSize,
 
-                      repeat: true,
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
 
-                      fit: BoxFit.contain,
+                                        gradient: SweepGradient(
+                                          colors: [
+                                            Color(0xFF6C63FF),
 
-                      width: 260,
-                      height: 260,
+                                            Color(0xFF8B5CF6),
 
-                      errorBuilder: (context, error, stackTrace) {
-                        return const Icon(
-                          Icons.account_balance_wallet_rounded,
-                          size: 120,
-                          color: Color(0xFF6C63FF),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
+                                            Color(0xFF00C6FF),
 
-              const SizedBox(height: 25),
+                                            Color(0xFF6C63FF),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
 
-              /// =========================
-              /// APP TITLE
-              /// =========================
-              FadeTransition(
-                opacity: _fadeAnimation,
+                                  /// INNER WHITE CIRCLE
+                                  Container(
+                                    height: innerSize,
+                                    width: innerSize,
 
-                child: ShaderMask(
-                  shaderCallback: (bounds) {
-                    return const LinearGradient(
-                      colors: [Color(0xFF5B4DFF), Color(0xFF8B5CF6)],
-                    ).createShader(bounds);
-                  },
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
 
-                  child: const Text(
-                    'RUPIXA',
+                                      color:
+                                          (isDark
+                                                  ? const Color(0xFF171C2C)
+                                                  : Colors.white)
+                                              .withValues(alpha: 0.92),
 
-                    style: TextStyle(
-                      fontSize: 54,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.white,
-                      letterSpacing: 6,
-                      height: 1,
-                    ),
-                  ),
-                ),
-              ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.deepPurple.withValues(
+                                            alpha: 0.10,
+                                          ),
 
-              const SizedBox(height: 14),
+                                          blurRadius: 40,
+                                          spreadRadius: 10,
 
-              FadeTransition(
-                opacity: _fadeAnimation,
+                                          offset: const Offset(0, 15),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
 
-                child: Text(
-                  'Smart Expense Companion',
+                                  /// CENTER ICON
+                                  Container(
+                                    height: iconSize,
+                                    width: iconSize,
 
-                  style: TextStyle(
-                    fontSize: 17,
-                    color: Colors.grey.shade700,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 1.1,
-                  ),
-                ),
-              ),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(40),
 
-              const SizedBox(height: 60),
+                                      gradient: const LinearGradient(
+                                        begin: Alignment.topLeft,
 
-              /// =========================
-              /// PREMIUM PROGRESS
-              /// =========================
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 55),
+                                        end: Alignment.bottomRight,
 
-                child: Column(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(30),
+                                        colors: [
+                                          Color(0xFF6C63FF),
+                                          Color(0xFF8B5CF6),
+                                        ],
+                                      ),
 
-                      child: TweenAnimationBuilder<double>(
-                        tween: Tween(begin: 0, end: _progress),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: const Color(
+                                            0xFF6C63FF,
+                                          ).withValues(alpha: 0.30),
 
-                        duration: const Duration(milliseconds: 350),
+                                          blurRadius: 30,
+                                          spreadRadius: 4,
 
-                        curve: Curves.easeOutCubic,
+                                          offset: const Offset(0, 12),
+                                        ),
+                                      ],
+                                    ),
 
-                        builder: (context, value, _) {
-                          return LinearProgressIndicator(
-                            value: value,
+                                    child: Icon(
+                                      Icons.account_balance_wallet_rounded,
 
-                            minHeight: 9,
+                                      color: Colors.white,
+                                      size: compact ? 54 : 68,
+                                    ),
+                                  ),
 
-                            backgroundColor: Colors.white,
+                                  /// FLOATING DOTS
+                                  Positioned(
+                                    top: 40,
+                                    right: 85,
 
-                            valueColor: const AlwaysStoppedAnimation(
-                              Color(0xFF6C63FF),
+                                    child: _buildFloatingDot(
+                                      size: 16,
+
+                                      color: const Color(0xFF00C6FF),
+                                    ),
+                                  ),
+
+                                  Positioned(
+                                    bottom: 55,
+                                    left: 70,
+
+                                    child: _buildFloatingDot(
+                                      size: 12,
+
+                                      color: const Color(0xFF8B5CF6),
+                                    ),
+                                  ),
+
+                                  Positioned(
+                                    top: 75,
+                                    left: 60,
+
+                                    child: _buildFloatingDot(
+                                      size: 10,
+
+                                      color: const Color(0xFF6C63FF),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           );
                         },
                       ),
-                    ),
 
-                    const SizedBox(height: 20),
+                      SizedBox(height: compact ? 12 : 20),
 
-                    AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 400),
+                      /// =========================
+                      /// APP TITLE
+                      /// =========================
+                      FadeTransition(
+                        opacity: _fadeAnimation,
 
-                      child: Text(
-                        _loadingText,
+                        child: ShaderMask(
+                          shaderCallback: (bounds) {
+                            return const LinearGradient(
+                              colors: [Color(0xFF5B4DFF), Color(0xFF8B5CF6)],
+                            ).createShader(bounds);
+                          },
 
-                        key: ValueKey(_loadingText),
+                          child: Text(
+                            'RUPIXA AI',
 
-                        style: TextStyle(
-                          color: Colors.grey.shade700,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
+                            style: TextStyle(
+                              fontSize: compact ? 40 : 54,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white,
+                              letterSpacing: 6,
+                              height: 1,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+
+                      const SizedBox(height: 14),
+
+                      FadeTransition(
+                        opacity: _fadeAnimation,
+
+                        child: Text(
+                          'Smart Expense Companion',
+
+                          style: TextStyle(
+                            fontSize: 17,
+                            color: colorScheme.onSurfaceVariant,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 1.1,
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: compact ? 32 : 60),
+
+                      /// =========================
+                      /// PROGRESS BAR
+                      /// =========================
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 55),
+
+                        child: Column(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(30),
+
+                              child: TweenAnimationBuilder<double>(
+                                tween: Tween(begin: 0, end: _progress),
+
+                                duration: const Duration(milliseconds: 350),
+
+                                curve: Curves.easeOutCubic,
+
+                                builder: (context, value, _) {
+                                  return LinearProgressIndicator(
+                                    value: value,
+
+                                    minHeight: 9,
+
+                                    backgroundColor: isDark
+                                        ? Colors.white.withValues(alpha: 0.12)
+                                        : Colors.white,
+
+                                    valueColor: const AlwaysStoppedAnimation(
+                                      Color(0xFF6C63FF),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+
+                            const SizedBox(height: 20),
+
+                            AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 400),
+
+                              child: Text(
+                                _loadingText,
+
+                                key: ValueKey(_loadingText),
+
+                                style: TextStyle(
+                                  color: colorScheme.onSurfaceVariant,
+
+                                  fontSize: 15,
+
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      SizedBox(height: compact ? 34 : 70),
+
+                      /// =========================
+                      /// FOOTER
+                      /// =========================
+                      Text(
+                        'AI Powered Financial Intelligence',
+
+                        style: TextStyle(
+                          color: colorScheme.onSurfaceVariant,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 0.6,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-
-              const SizedBox(height: 70),
-
-              /// =========================
-              /// FOOTER
-              /// =========================
-              Text(
-                'AI Powered Financial Intelligence',
-
-                style: TextStyle(
-                  color: Colors.grey.shade500,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: 0.6,
-                ),
-              ),
-            ],
+              );
+            },
           ),
         ),
       ),

@@ -6,6 +6,7 @@ import 'package:rupixa_ai/screens/bills/add_bill_screen.dart';
 import 'package:rupixa_ai/screens/expenses/add_expense_screen.dart';
 import 'package:rupixa_ai/screens/expenses/edit_expense_screen.dart';
 import 'package:rupixa_ai/screens/expenses/expenses_screen.dart';
+import 'package:rupixa_ai/screens/insights/insights_screen.dart';
 import 'package:rupixa_ai/screens/navigation/bottom_nav_screen.dart';
 
 import '../screens/auth/login_screen.dart';
@@ -100,6 +101,11 @@ final GoRouter appRouter = GoRouter(
           },
         );
       },
+    ),
+
+    GoRoute(
+      path: '/insights',
+      builder: (context, state) => const InsightsScreen(),
     ),
 
     GoRoute(

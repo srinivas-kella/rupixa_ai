@@ -30,20 +30,24 @@ void main() async {
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   /// =========================================
-  /// PREMIUM SYSTEM UI
+  /// PREMIUM IMMERSIVE UI
   /// =========================================
 
-  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
+
       systemNavigationBarColor: Colors.transparent,
 
       statusBarBrightness: Brightness.light,
 
-      statusBarIconBrightness: Brightness.dark,
-      systemNavigationBarIconBrightness: Brightness.dark,
+      statusBarIconBrightness: Brightness.light,
+
+      systemNavigationBarIconBrightness: Brightness.light,
+
+      systemNavigationBarDividerColor: Colors.transparent,
     ),
   );
 

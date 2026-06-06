@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../analytics/analytics_screen.dart';
@@ -20,7 +21,10 @@ class BottomNavScreen extends StatefulWidget {
 class _BottomNavScreenState extends State<BottomNavScreen> {
   int currentIndex = 0;
 
+  bool _isNavVisible = true;
+
   static const Color primary = Color(0xFF5B67FF);
+
   static const Color secondary = Color(0xFF7B61FF);
 
   late final List<Widget> screens;
@@ -66,157 +70,230 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = colorScheme.brightness == Brightness.dark;
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
+
       extendBody: true,
 
-      body: screens[currentIndex],
+      body: NotificationListener<UserScrollNotification>(
+        onNotification: (notification) {
+          if (notification.direction == ScrollDirection.reverse) {
+            if (_isNavVisible) {
+              setState(() {
+                _isNavVisible = false;
+              });
+            }
+          }
 
-      bottomNavigationBar: SafeArea(
-        top: false,
+          if (notification.direction == ScrollDirection.forward) {
+            if (!_isNavVisible) {
+              setState(() {
+                _isNavVisible = true;
+              });
+            }
+          }
 
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(14, 0, 14, 0),
+          return true;
+        },
 
-          child: ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(34)),
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 280),
 
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+          switchInCurve: Curves.easeOutCubic,
 
-              child: Container(
-                height: 88,
+          switchOutCurve: Curves.easeInCubic,
 
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 10,
-                ),
+          transitionBuilder: (child, animation) {
+            return FadeTransition(
+              opacity: animation,
 
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+              child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0.03, 0),
 
-                    colors: [
-                      Colors.white.withValues(alpha: 0.95),
-                      Colors.white.withValues(alpha: 0.88),
-                    ],
-                  ),
+                  end: Offset.zero,
+                ).animate(animation),
 
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(34),
-                  ),
+                child: child,
+              ),
+            );
+          },
 
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.35),
-                    width: 1,
-                  ),
+          child: KeyedSubtree(
+            key: ValueKey(currentIndex),
 
-                  boxShadow: [
-                    BoxShadow(
-                      color: primary.withValues(alpha: 0.10),
-                      blurRadius: 30,
-                      spreadRadius: 1,
-                      offset: const Offset(0, -2),
+            child: screens[currentIndex],
+          ),
+        ),
+      ),
+
+      /// =========================================
+      /// PREMIUM FLOATING NAVBAR
+      /// =========================================
+      bottomNavigationBar: AnimatedSlide(
+        duration: const Duration(milliseconds: 350),
+
+        curve: Curves.easeOutCubic,
+
+        offset: _isNavVisible ? Offset.zero : const Offset(0, 1.5),
+
+        child: AnimatedOpacity(
+          duration: const Duration(milliseconds: 250),
+
+          opacity: _isNavVisible ? 1 : 0,
+
+          child: SafeArea(
+            top: false,
+
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
+
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(32),
+
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+
+                  child: Container(
+                    height: 82,
+
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 10,
                     ),
-                  ],
-                ),
 
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    decoration: BoxDecoration(
+                      color: (isDark ? const Color(0xFF101623) : Colors.white)
+                          .withValues(alpha: isDark ? 0.84 : 0.78),
 
-                  children: List.generate(icons.length, (index) {
-                    final bool isSelected = currentIndex == index;
+                      borderRadius: BorderRadius.circular(32),
 
-                    return Expanded(
-                      child: GestureDetector(
-                        onTap: () async {
-                          await HapticFeedback.mediumImpact();
+                      border: Border.all(
+                        color: (isDark ? Colors.white : Colors.white)
+                            .withValues(alpha: isDark ? 0.10 : 0.35),
+                      ),
 
-                          setState(() {
-                            currentIndex = index;
-                          });
-                        },
+                      boxShadow: [
+                        BoxShadow(
+                          color: primary.withValues(alpha: 0.08),
 
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 280),
+                          blurRadius: 40,
 
-                          curve: Curves.easeInOut,
+                          spreadRadius: 1,
 
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
 
-                          padding: EdgeInsets.symmetric(
-                            vertical: 12,
-                            horizontal: isSelected ? 10 : 0,
-                          ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
-                          decoration: BoxDecoration(
-                            gradient: isSelected
-                                ? const LinearGradient(
-                                    colors: [primary, secondary],
-                                  )
-                                : null,
+                      children: List.generate(icons.length, (index) {
+                        final bool isSelected = currentIndex == index;
 
-                            borderRadius: BorderRadius.circular(22),
+                        return Expanded(
+                          child: GestureDetector(
+                            onTap: () async {
+                              await HapticFeedback.lightImpact();
 
-                            boxShadow: isSelected
-                                ? [
-                                    BoxShadow(
-                                      color: primary.withValues(alpha: 0.35),
+                              setState(() {
+                                currentIndex = index;
+                              });
+                            },
 
-                                      blurRadius: 18,
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
 
-                                      offset: const Offset(0, 8),
-                                    ),
-                                  ]
-                                : [],
-                          ),
+                              curve: Curves.easeOutCubic,
 
-                          child: AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 250),
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
 
-                            child: isSelected
-                                ? Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                              padding: EdgeInsets.symmetric(
+                                vertical: 12,
 
-                                    children: [
-                                      Icon(
-                                        icons[index],
-                                        color: Colors.white,
-                                        size: 24,
-                                      ),
+                                horizontal: isSelected ? 12 : 0,
+                              ),
 
-                                      const SizedBox(width: 8),
+                              decoration: BoxDecoration(
+                                gradient: isSelected
+                                    ? const LinearGradient(
+                                        colors: [primary, secondary],
+                                      )
+                                    : null,
 
-                                      Flexible(
-                                        child: Text(
-                                          labels[index],
+                                borderRadius: BorderRadius.circular(24),
 
-                                          overflow: TextOverflow.ellipsis,
+                                boxShadow: isSelected
+                                    ? [
+                                        BoxShadow(
+                                          color: primary.withValues(
+                                            alpha: 0.30,
+                                          ),
 
-                                          style: GoogleFonts.poppins(
+                                          blurRadius: 18,
+
+                                          offset: const Offset(0, 8),
+                                        ),
+                                      ]
+                                    : [],
+                              ),
+
+                              child: AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 220),
+
+                                child: isSelected
+                                    ? Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+
+                                        children: [
+                                          Icon(
+                                            icons[index],
+
                                             color: Colors.white,
 
-                                            fontWeight: FontWeight.w600,
-
-                                            fontSize: 13,
+                                            size: 23,
                                           ),
-                                        ),
+
+                                          const SizedBox(width: 8),
+
+                                          Flexible(
+                                            child: Text(
+                                              labels[index],
+
+                                              overflow: TextOverflow.ellipsis,
+
+                                              style: GoogleFonts.poppins(
+                                                color: Colors.white,
+
+                                                fontWeight: FontWeight.w600,
+
+                                                fontSize: 13,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    : Icon(
+                                        icons[index],
+
+                                        color: isDark
+                                            ? Colors.white60
+                                            : Colors.grey.shade500,
+
+                                        size: 23,
                                       ),
-                                    ],
-                                  )
-                                : Icon(
-                                    icons[index],
-
-                                    color: Colors.grey.shade500,
-
-                                    size: 24,
-                                  ),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    );
-                  }),
+                        );
+                      }),
+                    ),
+                  ),
                 ),
               ),
             ),

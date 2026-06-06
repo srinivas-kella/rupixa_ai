@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
+import 'core/widgets/app_lock_gate.dart';
 import 'providers/theme_provider.dart';
 import 'routes/router.dart';
 
@@ -35,6 +36,46 @@ class MyApp extends StatelessWidget {
       themeMode: themeProvider.currentTheme,
 
       /// =========================================
+      /// PREMIUM SCROLLING
+      /// =========================================
+      scrollBehavior: const MaterialScrollBehavior().copyWith(
+        physics: const BouncingScrollPhysics(),
+      ),
+
+      /// =========================================
+      /// GLOBAL PAGE TRANSITIONS
+      /// =========================================
+      builder: (context, child) {
+        return AppLockGate(
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 280),
+
+            switchInCurve: Curves.easeOutCubic,
+
+            switchOutCurve: Curves.easeInCubic,
+
+            transitionBuilder: (child, animation) {
+              return FadeTransition(
+                opacity: animation,
+
+                child: SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(0.02, 0),
+
+                    end: Offset.zero,
+                  ).animate(animation),
+
+                  child: child,
+                ),
+              );
+            },
+
+            child: child,
+          ),
+        );
+      },
+
+      /// =========================================
       /// LIGHT THEME
       /// =========================================
       theme: ThemeData(
@@ -45,6 +86,12 @@ class MyApp extends StatelessWidget {
         primaryColor: primary,
 
         scaffoldBackgroundColor: lightBg,
+
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+
+        splashFactory: NoSplash.splashFactory,
 
         splashColor: Colors.transparent,
 
@@ -64,7 +111,9 @@ class MyApp extends StatelessWidget {
           surface: Colors.white,
         ),
 
+        /// =========================================
         /// TEXT THEME
+        /// =========================================
         textTheme: GoogleFonts.poppinsTextTheme().copyWith(
           headlineLarge: GoogleFonts.poppins(
             fontSize: 34,
@@ -95,7 +144,9 @@ class MyApp extends StatelessWidget {
           ),
         ),
 
+        /// =========================================
         /// APP BAR
+        /// =========================================
         appBarTheme: AppBarTheme(
           backgroundColor: Colors.transparent,
 
@@ -116,7 +167,9 @@ class MyApp extends StatelessWidget {
           ),
         ),
 
+        /// =========================================
         /// CARD THEME
+        /// =========================================
         cardTheme: CardThemeData(
           elevation: 0,
 
@@ -131,7 +184,9 @@ class MyApp extends StatelessWidget {
           margin: EdgeInsets.zero,
         ),
 
+        /// =========================================
         /// INPUTS
+        /// =========================================
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
 
@@ -139,7 +194,6 @@ class MyApp extends StatelessWidget {
 
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 20,
-
             vertical: 20,
           ),
 
@@ -168,7 +222,22 @@ class MyApp extends StatelessWidget {
           ),
         ),
 
+        switchTheme: SwitchThemeData(
+          thumbColor: WidgetStateProperty.resolveWith((states) {
+            return states.contains(WidgetState.selected)
+                ? Colors.white
+                : Colors.grey.shade500;
+          }),
+          trackColor: WidgetStateProperty.resolveWith((states) {
+            return states.contains(WidgetState.selected)
+                ? primary
+                : Colors.grey.shade300;
+          }),
+        ),
+
+        /// =========================================
         /// BUTTONS
+        /// =========================================
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             backgroundColor: primary,
@@ -193,7 +262,9 @@ class MyApp extends StatelessWidget {
           ),
         ),
 
+        /// =========================================
         /// FAB
+        /// =========================================
         floatingActionButtonTheme: FloatingActionButtonThemeData(
           backgroundColor: primary,
 
@@ -206,21 +277,9 @@ class MyApp extends StatelessWidget {
           ),
         ),
 
-        /// BOTTOM SHEET
-        bottomSheetTheme: const BottomSheetThemeData(
-          backgroundColor: Colors.white,
-
-          elevation: 0,
-        ),
-
-        /// DIVIDER
-        dividerTheme: DividerThemeData(
-          color: Colors.grey.shade200,
-
-          thickness: 1,
-        ),
-
+        /// =========================================
         /// CHIP
+        /// =========================================
         chipTheme: ChipThemeData(
           backgroundColor: Colors.white,
 
@@ -239,10 +298,12 @@ class MyApp extends StatelessWidget {
           ),
         ),
 
+        /// =========================================
         /// PAGE TRANSITIONS
+        /// =========================================
         pageTransitionsTheme: const PageTransitionsTheme(
           builders: {
-            TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+            TargetPlatform.android: FadeForwardsPageTransitionsBuilder(),
 
             TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
           },
@@ -257,9 +318,15 @@ class MyApp extends StatelessWidget {
 
         brightness: Brightness.dark,
 
+        primaryColor: primary,
+
         scaffoldBackgroundColor: darkBg,
 
-        primaryColor: primary,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+
+        splashFactory: NoSplash.splashFactory,
 
         splashColor: Colors.transparent,
 
@@ -279,7 +346,9 @@ class MyApp extends StatelessWidget {
           surface: const Color(0xFF171C2C),
         ),
 
+        /// =========================================
         /// TEXT THEME
+        /// =========================================
         textTheme: GoogleFonts.poppinsTextTheme(ThemeData.dark().textTheme)
             .copyWith(
               headlineLarge: GoogleFonts.poppins(
@@ -307,7 +376,9 @@ class MyApp extends StatelessWidget {
               ),
             ),
 
+        /// =========================================
         /// APP BAR
+        /// =========================================
         appBarTheme: AppBarTheme(
           backgroundColor: Colors.transparent,
 
@@ -326,113 +397,93 @@ class MyApp extends StatelessWidget {
           ),
         ),
 
-        /// CARD
         cardTheme: CardThemeData(
           elevation: 0,
-
           color: const Color(0xFF171C2C),
-
-          shadowColor: Colors.black.withValues(alpha: 0.25),
-
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(32),
-          ),
+          shadowColor: Colors.black.withValues(alpha: 0.18),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          margin: EdgeInsets.zero,
         ),
 
-        /// INPUTS
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
-
-          fillColor: const Color(0xFF1C2336),
-
+          fillColor: const Color(0xFF171C2C),
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 20,
-
             vertical: 20,
           ),
-
-          hintStyle: GoogleFonts.poppins(color: Colors.white54),
-
+          hintStyle: GoogleFonts.poppins(color: Colors.white54, fontSize: 14),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(22),
-
             borderSide: BorderSide.none,
           ),
-
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(22),
-
             borderSide: BorderSide.none,
           ),
-
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(22),
-
-            borderSide: const BorderSide(color: primary, width: 1.5),
+            borderSide: BorderSide(color: primary, width: 1.5),
           ),
         ),
 
-        /// BUTTONS
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             backgroundColor: primary,
-
             foregroundColor: Colors.white,
-
             elevation: 0,
-
             shadowColor: Colors.transparent,
-
             padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
-
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(22),
             ),
-
             textStyle: GoogleFonts.poppins(
               fontWeight: FontWeight.w600,
-
               fontSize: 16,
             ),
           ),
         ),
 
-        /// FAB
         floatingActionButtonTheme: FloatingActionButtonThemeData(
           backgroundColor: primary,
-
           foregroundColor: Colors.white,
-
           elevation: 0,
-
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
         ),
 
-        /// CHIP
         chipTheme: ChipThemeData(
-          backgroundColor: const Color(0xFF1B2235),
-
-          disabledColor: Colors.grey.shade800,
-
+          backgroundColor: const Color(0xFF171C2C),
+          disabledColor: const Color(0xFF242B3D),
           selectedColor: primary.withValues(alpha: 0.18),
-
           secondarySelectedColor: primary.withValues(alpha: 0.18),
-
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-
-          labelStyle: GoogleFonts.poppins(color: Colors.white),
-
+          labelStyle: GoogleFonts.poppins(fontWeight: FontWeight.w500),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
         ),
 
+        switchTheme: SwitchThemeData(
+          thumbColor: WidgetStateProperty.resolveWith((states) {
+            return states.contains(WidgetState.selected)
+                ? Colors.white
+                : Colors.grey.shade500;
+          }),
+          trackColor: WidgetStateProperty.resolveWith((states) {
+            return states.contains(WidgetState.selected)
+                ? primary
+                : const Color(0xFF30384D);
+          }),
+        ),
+
+        /// =========================================
         /// PAGE TRANSITIONS
+        /// =========================================
         pageTransitionsTheme: const PageTransitionsTheme(
           builders: {
-            TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+            TargetPlatform.android: FadeForwardsPageTransitionsBuilder(),
 
             TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
           },
