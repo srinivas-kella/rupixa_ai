@@ -357,7 +357,11 @@ class _AddBillScreenState extends State<AddBillScreen>
 
       await Provider.of<BillProvider>(context, listen: false).addBill(bill);
 
-      final scheduledReminder = DateTime.now().add(const Duration(minutes: 1));
+      final reminderTime = bill.dueDate.subtract(const Duration(days: 2));
+
+      final scheduledReminder = reminderTime.isBefore(DateTime.now())
+          ? DateTime.now().add(const Duration(minutes: 1))
+          : reminderTime;
 
       // await NotificationService.scheduleBillReminder(
       //   id: bill.hashCode,
@@ -368,9 +372,21 @@ class _AddBillScreenState extends State<AddBillScreen>
 
       await NotificationService.scheduleBillReminder(
         id: bill.hashCode,
-        title: 'Bill Reminder',
-        body: '${bill.title} is due soon',
+
+        title: bill.title,
+
+        body:
+            '₹${bill.amount.toStringAsFixed(0)} '
+            'due on '
+            '${bill.dueDate.day}/${bill.dueDate.month}/${bill.dueDate.year}',
+
         scheduledDate: scheduledReminder,
+
+        category: bill.category,
+
+        amount: bill.amount,
+
+        dueDate: bill.dueDate,
       );
 
       await NotificationService.checkPendingNotifications();
@@ -402,20 +418,25 @@ class _AddBillScreenState extends State<AddBillScreen>
       });
 
       showSuccessPopup();
-    } catch (e) {
-      setState(() {
-        isSaving = false;
-      });
+    } catch (e, stackTrace) {
+      debugPrint('SAVE BILL ERROR: $e');
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          behavior: SnackBarBehavior.floating,
+      debugPrintStack(stackTrace: stackTrace);
 
-          content: Text(e.toString()),
-        ),
-      );
-    }
-  }
+      if (mounted) {
+        setState(() {
+          isSaving = false;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            content: Text(e.toString()),
+          ),
+        );
+      }
+    } // closes catch
+  } // closes saveBill()
 
   @override
   Widget build(BuildContext context) {

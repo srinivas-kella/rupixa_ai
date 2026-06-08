@@ -14,8 +14,7 @@ import 'package:rupixa_ai/screens/expenses/calendar_screen.dart';
 import 'package:rupixa_ai/screens/expenses/cloud_expenses_screen.dart';
 import 'package:rupixa_ai/screens/insights/insights_screen.dart';
 import 'package:rupixa_ai/screens/notifications/notification_screen.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:rupixa_ai/models/notification_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DashboardScreen extends StatefulWidget {
   final Function(int)? onNavigate;
@@ -487,35 +486,60 @@ class _DashboardScreenState extends State<DashboardScreen>
                                                       top: -2,
                                                       right: -2,
 
-                                                      child: Container(
-                                                        height: 18,
-                                                        width: 18,
+                                                      child: StreamBuilder<QuerySnapshot>(
+                                                        stream: FirebaseFirestore
+                                                            .instance
+                                                            .collection(
+                                                              'notifications',
+                                                            )
+                                                            .where(
+                                                              'isRead',
+                                                              isEqualTo: false,
+                                                            )
+                                                            .snapshots(),
 
-                                                        decoration: BoxDecoration(
-                                                          color:
-                                                              Colors.redAccent,
-                                                          borderRadius:
-                                                              BorderRadius.circular(
-                                                                20,
+                                                        builder: (context, snapshot) {
+                                                          final count =
+                                                              snapshot
+                                                                  .data
+                                                                  ?.docs
+                                                                  .length ??
+                                                              0;
+
+                                                          if (count == 0) {
+                                                            return const SizedBox.shrink();
+                                                          }
+
+                                                          return Container(
+                                                            height: 18,
+                                                            width: 18,
+
+                                                            decoration: BoxDecoration(
+                                                              color: Colors
+                                                                  .redAccent,
+                                                              borderRadius:
+                                                                  BorderRadius.circular(
+                                                                    20,
+                                                                  ),
+
+                                                              border: Border.all(
+                                                                color:
+                                                                    colorScheme
+                                                                        .surface,
+                                                                width: 2,
                                                               ),
-                                                          border: Border.all(
-                                                            color: colorScheme
-                                                                .surface,
-                                                            width: 2,
-                                                          ),
-                                                        ),
+                                                            ),
 
-                                                        alignment:
-                                                            Alignment.center,
+                                                            alignment: Alignment
+                                                                .center,
 
-                                                        child: Text(
-                                                          Hive.box<
-                                                                NotificationModel
-                                                              >('notificationsBox')
-                                                              .length
-                                                              .toString(),
-                                                          style:
-                                                              GoogleFonts.poppins(
+                                                            child: Text(
+                                                              count > 99
+                                                                  ? '99+'
+                                                                  : count
+                                                                        .toString(),
+
+                                                              style: GoogleFonts.poppins(
                                                                 color: Colors
                                                                     .white,
                                                                 fontSize: 9,
@@ -523,7 +547,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                                                                     FontWeight
                                                                         .w700,
                                                               ),
-                                                        ),
+                                                            ),
+                                                          );
+                                                        },
                                                       ),
                                                     ),
                                                   ],

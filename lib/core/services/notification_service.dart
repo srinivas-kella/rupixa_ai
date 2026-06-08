@@ -1,6 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:hive/hive.dart';
-import 'package:rupixa_ai/models/notification_model.dart';
+import 'package:rupixa_ai/core/services/notification_firestore_service.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -33,9 +33,7 @@ class NotificationService {
 
     try {
       await androidPlugin?.requestExactAlarmsPermission();
-    } catch (_) {
-      // Older Android versions may not support this.
-    }
+    } catch (_) {}
   }
 
   /// =========================================
@@ -61,10 +59,12 @@ class NotificationService {
     );
 
     await notificationsPlugin.show(id, title, body, details);
-    final box = Hive.box<NotificationModel>('notificationsBox');
 
-    await box.add(
-      NotificationModel(title: title, body: body, createdAt: DateTime.now()),
+    /// SAVE TO FIRESTORE
+    await NotificationFirestoreService.addNotification(
+      title: title,
+      body: body,
+      type: 'general',
     );
   }
 
@@ -77,6 +77,10 @@ class NotificationService {
     required String title,
     required String body,
     required DateTime scheduledDate,
+
+    String? category,
+    double? amount,
+    DateTime? dueDate,
   }) async {
     print('Scheduling notification for: $scheduledDate');
 
@@ -104,11 +108,29 @@ class NotificationService {
           UILocalNotificationDateInterpretation.absoluteTime,
     );
 
+    /// SAVE TO FIRESTORE
+    await FirebaseFirestore.instance.collection('notifications').add({
+      'title': title,
+      'body': body,
+
+      'type': 'bill',
+
+      'category': category,
+
+      'amount': amount,
+
+      'dueDate': dueDate != null ? Timestamp.fromDate(dueDate) : null,
+
+      'isRead': false,
+
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+
     print('Notification scheduled successfully');
   }
 
   /// =========================================
-  /// PENDING NOTIFICATIONS
+  /// CHECK PENDING
   /// =========================================
 
   static Future<void> checkPendingNotifications() async {
@@ -131,6 +153,10 @@ class NotificationService {
   static Future<void> cancelNotification(int id) async {
     await notificationsPlugin.cancel(id);
   }
+
+  /// =========================================
+  /// REQUEST PERMISSION
+  /// =========================================
 
   static Future<bool> requestPermission() async {
     final androidPlugin = notificationsPlugin
