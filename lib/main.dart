@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import 'package:rupixa_ai/firebase_options.dart';
 import 'package:rupixa_ai/models/bill_model.dart';
+import 'package:rupixa_ai/models/notification_model.dart';
 
 import 'app.dart';
 
@@ -72,15 +73,18 @@ void main() async {
 
   Hive.registerAdapter(ExpenseModelAdapter());
   Hive.registerAdapter(BillModelAdapter());
+  Hive.registerAdapter(NotificationModelAdapter());
 
   await Hive.openBox<ExpenseModel>('expensesBox');
   await Hive.openBox<BillModel>('billsBox');
+  await Hive.openBox<NotificationModel>('notificationsBox');
 
   /// =========================================
   /// NOTIFICATIONS
   /// =========================================
 
   await NotificationService.initialize();
+  await NotificationService.requestPermission();
 
   runApp(
     MultiProvider(

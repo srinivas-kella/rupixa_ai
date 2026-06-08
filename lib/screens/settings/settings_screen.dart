@@ -199,16 +199,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
       return;
     }
 
-    await NotificationService.showNotification(
-      id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
-      title: 'Rupixa AI',
-      body: 'Notifications are working correctly.',
+    await NotificationService.scheduleBillReminder(
+      id: 999,
+      title: 'Test Reminder',
+      body: 'Scheduled reminder working',
+      scheduledDate: DateTime.now().add(const Duration(minutes: 1)),
     );
 
-    if (!mounted) return;
-
-    setState(() => notifications = true);
-    await _saveSetting('notifications', true);
+    _showSnack('Reminder scheduled for 1 minute from now.');
   }
 
   Future<void> _showBudgetSheet() async {

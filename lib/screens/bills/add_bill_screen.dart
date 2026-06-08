@@ -355,7 +355,25 @@ class _AddBillScreenState extends State<AddBillScreen>
         reminderDate: reminderDate,
       );
 
-      Provider.of<BillProvider>(context, listen: false).addBill(bill);
+      await Provider.of<BillProvider>(context, listen: false).addBill(bill);
+
+      final scheduledReminder = DateTime.now().add(const Duration(minutes: 1));
+
+      // await NotificationService.scheduleBillReminder(
+      //   id: bill.hashCode,
+      //   title: 'Bill Reminder',
+      //   body: '${bill.title} is due soon',
+      //   scheduledDate: scheduledReminder,
+      // );
+
+      await NotificationService.scheduleBillReminder(
+        id: bill.hashCode,
+        title: 'Bill Reminder',
+        body: '${bill.title} is due soon',
+        scheduledDate: scheduledReminder,
+      );
+
+      await NotificationService.checkPendingNotifications();
 
       await BillFirestoreService.addBill(
         title: bill.title,

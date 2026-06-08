@@ -13,6 +13,9 @@ import 'package:rupixa_ai/core/utils/category_helper.dart';
 import 'package:rupixa_ai/screens/expenses/calendar_screen.dart';
 import 'package:rupixa_ai/screens/expenses/cloud_expenses_screen.dart';
 import 'package:rupixa_ai/screens/insights/insights_screen.dart';
+import 'package:rupixa_ai/screens/notifications/notification_screen.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:rupixa_ai/models/notification_model.dart';
 
 class DashboardScreen extends StatefulWidget {
   final Function(int)? onNavigate;
@@ -407,41 +410,123 @@ class _DashboardScreenState extends State<DashboardScreen>
                                           /// ACTIONS
                                           Row(
                                             children: [
-                                              AnimatedContainer(
-                                                duration: const Duration(
-                                                  milliseconds: 220,
-                                                ),
+                                              GestureDetector(
+                                                onTap: () async {
+                                                  await HapticFeedback.lightImpact();
 
-                                                height: collapsed ? 38 : 46,
-                                                width: collapsed ? 38 : 46,
+                                                  if (!mounted) return;
 
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                        collapsed ? 12 : 16,
+                                                  Navigator.push(
+                                                    context,
+                                                    CupertinoPageRoute(
+                                                      builder: (_) =>
+                                                          const NotificationScreen(),
+                                                    ),
+                                                  );
+                                                },
+
+                                                child: Stack(
+                                                  clipBehavior: Clip.none,
+
+                                                  children: [
+                                                    AnimatedContainer(
+                                                      duration: const Duration(
+                                                        milliseconds: 220,
                                                       ),
 
-                                                  gradient: LinearGradient(
-                                                    colors: [
-                                                      colorScheme.surface,
-                                                      colorScheme.surface
-                                                          .withValues(
-                                                            alpha: 0.92,
+                                                      height: collapsed
+                                                          ? 38
+                                                          : 46,
+                                                      width: collapsed
+                                                          ? 38
+                                                          : 46,
+
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              collapsed
+                                                                  ? 12
+                                                                  : 16,
+                                                            ),
+
+                                                        gradient:
+                                                            LinearGradient(
+                                                              colors: [
+                                                                colorScheme
+                                                                    .surface,
+                                                                colorScheme
+                                                                    .surface
+                                                                    .withValues(
+                                                                      alpha:
+                                                                          0.92,
+                                                                    ),
+                                                              ],
+                                                            ),
+
+                                                        border: Border.all(
+                                                          color: colorScheme
+                                                              .outlineVariant
+                                                              .withValues(
+                                                                alpha: 0.5,
+                                                              ),
+                                                        ),
+                                                      ),
+
+                                                      child: Icon(
+                                                        CupertinoIcons
+                                                            .bell_fill,
+                                                        size: collapsed
+                                                            ? 18
+                                                            : 20,
+                                                        color: colorScheme
+                                                            .onSurface,
+                                                      ),
+                                                    ),
+
+                                                    Positioned(
+                                                      top: -2,
+                                                      right: -2,
+
+                                                      child: Container(
+                                                        height: 18,
+                                                        width: 18,
+
+                                                        decoration: BoxDecoration(
+                                                          color:
+                                                              Colors.redAccent,
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                20,
+                                                              ),
+                                                          border: Border.all(
+                                                            color: colorScheme
+                                                                .surface,
+                                                            width: 2,
                                                           ),
-                                                    ],
-                                                  ),
+                                                        ),
 
-                                                  border: Border.all(
-                                                    color: colorScheme
-                                                        .outlineVariant
-                                                        .withValues(alpha: 0.5),
-                                                  ),
-                                                ),
+                                                        alignment:
+                                                            Alignment.center,
 
-                                                child: Icon(
-                                                  CupertinoIcons.bell_fill,
-                                                  size: collapsed ? 18 : 20,
-                                                  color: colorScheme.onSurface,
+                                                        child: Text(
+                                                          Hive.box<
+                                                                NotificationModel
+                                                              >('notificationsBox')
+                                                              .length
+                                                              .toString(),
+                                                          style:
+                                                              GoogleFonts.poppins(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 9,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w700,
+                                                              ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
                                               ),
 
@@ -777,10 +862,15 @@ class _DashboardScreenState extends State<DashboardScreen>
                                             ? Colors.green
                                             : Colors.red,
 
-                                        gradient: [
-                                          const Color(0xFFE7FFF1),
-                                          const Color(0xFFCFFFE2),
-                                        ],
+                                        gradient: isDark
+                                            ? [
+                                                const Color(0xFF1B2332),
+                                                const Color(0xFF252F42),
+                                              ]
+                                            : [
+                                                const Color(0xFFE7FFF1),
+                                                const Color(0xFFCFFFE2),
+                                              ],
                                       ),
                                     ),
 
@@ -799,10 +889,15 @@ class _DashboardScreenState extends State<DashboardScreen>
 
                                         color: Colors.orange,
 
-                                        gradient: [
-                                          const Color(0xFFFFF4E6),
-                                          const Color(0xFFFFE8C8),
-                                        ],
+                                        gradient: isDark
+                                            ? [
+                                                const Color(0xFF1B2332),
+                                                const Color(0xFF252F42),
+                                              ]
+                                            : [
+                                                const Color(0xFFFFF4E6),
+                                                const Color(0xFFFFE8C8),
+                                              ],
                                       ),
                                     ),
                                   ],
@@ -834,10 +929,15 @@ class _DashboardScreenState extends State<DashboardScreen>
 
                                         title: "Cloud",
 
-                                        gradient: [
-                                          const Color(0xFFEAF4FF),
-                                          const Color(0xFFD7E9FF),
-                                        ],
+                                        gradient: isDark
+                                            ? [
+                                                const Color(0xFF1B2332),
+                                                const Color(0xFF252F42),
+                                              ]
+                                            : [
+                                                const Color(0xFFEAF4FF),
+                                                const Color(0xFFD7E9FF),
+                                              ],
 
                                         onTap: () {
                                           Navigator.push(
@@ -860,10 +960,15 @@ class _DashboardScreenState extends State<DashboardScreen>
 
                                         title: "Calendar",
 
-                                        gradient: [
-                                          const Color(0xFFF0ECFF),
-                                          const Color(0xFFE2DBFF),
-                                        ],
+                                        gradient: isDark
+                                            ? [
+                                                const Color(0xFF1B2332),
+                                                const Color(0xFF252F42),
+                                              ]
+                                            : [
+                                                const Color(0xFFF0ECFF),
+                                                const Color(0xFFE2DBFF),
+                                              ],
 
                                         onTap: () {
                                           Navigator.push(
@@ -886,10 +991,15 @@ class _DashboardScreenState extends State<DashboardScreen>
 
                                         title: "Insights",
 
-                                        gradient: [
-                                          const Color(0xFFE8FCFF),
-                                          const Color(0xFFD2F7FF),
-                                        ],
+                                        gradient: isDark
+                                            ? [
+                                                const Color(0xFF1B2332),
+                                                const Color(0xFF252F42),
+                                              ]
+                                            : [
+                                                const Color(0xFFE8FCFF),
+                                                const Color(0xFFD2F7FF),
+                                              ],
 
                                         onTap: () {
                                           Navigator.push(
@@ -917,11 +1027,16 @@ class _DashboardScreenState extends State<DashboardScreen>
                                   padding: const EdgeInsets.all(24),
 
                                   decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
-                                      colors: [
-                                        Color(0xFFEFF3FF),
-                                        Color(0xFFE8EAFF),
-                                      ],
+                                    gradient: LinearGradient(
+                                      colors: isDark
+                                          ? [
+                                              const Color(0xFF1B2332),
+                                              const Color(0xFF252F42),
+                                            ]
+                                          : const [
+                                              Color(0xFFEFF3FF),
+                                              Color(0xFFE8EAFF),
+                                            ],
                                     ),
 
                                     borderRadius: BorderRadius.circular(32),

@@ -19,6 +19,76 @@ class BillsScreen extends StatefulWidget {
 
 class _BillsScreenState extends State<BillsScreen>
     with TickerProviderStateMixin {
+  IconData getCategoryIcon(String category) {
+    switch (category) {
+      case 'Electricity':
+        return CupertinoIcons.bolt_fill;
+      case 'Internet':
+        return CupertinoIcons.wifi;
+      case 'Water':
+        return CupertinoIcons.drop_fill;
+      case 'Rent':
+        return CupertinoIcons.house_fill;
+      case 'EMI':
+        return CupertinoIcons.creditcard_fill;
+      case 'Subscription':
+        return CupertinoIcons.play_rectangle_fill;
+      case 'Insurance':
+        return CupertinoIcons.shield_fill;
+      case 'Phone':
+        return CupertinoIcons.phone_fill;
+      case 'Gas':
+        return CupertinoIcons.flame_fill;
+      case 'Credit Card':
+        return CupertinoIcons.creditcard;
+      case 'Streaming':
+        return CupertinoIcons.tv_fill;
+      case 'Gym':
+        return CupertinoIcons.heart_fill;
+      case 'Education':
+        return CupertinoIcons.book_fill;
+      case 'Travel':
+        return CupertinoIcons.airplane;
+      default:
+        return CupertinoIcons.square_grid_2x2_fill;
+    }
+  }
+
+  Color getCategoryColor(String category) {
+    switch (category) {
+      case 'Electricity':
+        return Colors.orange;
+      case 'Internet':
+        return Colors.blue;
+      case 'Water':
+        return Colors.cyan;
+      case 'Rent':
+        return Colors.green;
+      case 'EMI':
+        return Colors.purple;
+      case 'Subscription':
+        return Colors.redAccent;
+      case 'Insurance':
+        return Colors.indigo;
+      case 'Phone':
+        return Colors.teal;
+      case 'Gas':
+        return Colors.deepOrange;
+      case 'Credit Card':
+        return Colors.pink;
+      case 'Streaming':
+        return Colors.deepPurple;
+      case 'Gym':
+        return Colors.red;
+      case 'Education':
+        return Colors.blueAccent;
+      case 'Travel':
+        return Colors.amber;
+      default:
+        return Colors.grey;
+    }
+  }
+
   static const Color primary = Color(0xFF5B67FF);
 
   static const Color secondary = Color(0xFF7B61FF);
@@ -279,7 +349,9 @@ class _BillsScreenState extends State<BillsScreen>
                               ? Colors.green.withValues(alpha: 0.12)
                               : isOverdue
                               ? Colors.red.withValues(alpha: 0.12)
-                              : primary.withValues(alpha: 0.12),
+                              : getCategoryColor(
+                                  bill.category,
+                                ).withValues(alpha: 0.12),
 
                           borderRadius: BorderRadius.circular(30),
                         ),
@@ -289,13 +361,13 @@ class _BillsScreenState extends State<BillsScreen>
                               ? CupertinoIcons.check_mark_circled_solid
                               : isOverdue
                               ? CupertinoIcons.exclamationmark_triangle_fill
-                              : CupertinoIcons.doc_text_fill,
+                              : getCategoryIcon(bill.category),
 
                           color: isPaid
                               ? Colors.green
                               : isOverdue
                               ? Colors.redAccent
-                              : primary,
+                              : getCategoryColor(bill.category),
 
                           size: 42,
                         ),
@@ -855,7 +927,9 @@ class _BillsScreenState extends State<BillsScreen>
 
                                 borderRadius: BorderRadius.circular(30),
 
-                                backgroundColor: Colors.white.withValues(alpha: 0.14),
+                                backgroundColor: Colors.white.withValues(
+                                  alpha: 0.14,
+                                ),
 
                                 valueColor: const AlwaysStoppedAnimation(
                                   Colors.white,
@@ -922,7 +996,9 @@ class _BillsScreenState extends State<BillsScreen>
                                   boxShadow: selected
                                       ? [
                                           BoxShadow(
-                                            color: primary.withValues(alpha: 0.25),
+                                            color: primary.withValues(
+                                              alpha: 0.25,
+                                            ),
 
                                             blurRadius: 18,
 
@@ -1360,7 +1436,10 @@ class _BillsScreenState extends State<BillsScreen>
             borderRadius: BorderRadius.circular(32),
 
             border: isOverdue
-                ? Border.all(color: Colors.red.withValues(alpha: 0.25), width: 1.2)
+                ? Border.all(
+                    color: Colors.red.withValues(alpha: 0.25),
+                    width: 1.2,
+                  )
                 : null,
 
             boxShadow: [
@@ -1394,13 +1473,13 @@ class _BillsScreenState extends State<BillsScreen>
                       ? CupertinoIcons.check_mark_circled_solid
                       : isOverdue
                       ? CupertinoIcons.exclamationmark_triangle_fill
-                      : CupertinoIcons.doc_text_fill,
+                      : getCategoryIcon(bill.category),
 
                   color: isPaid
                       ? Colors.green
                       : isOverdue
                       ? Colors.redAccent
-                      : primary,
+                      : getCategoryColor(bill.category),
 
                   size: 30,
                 ),

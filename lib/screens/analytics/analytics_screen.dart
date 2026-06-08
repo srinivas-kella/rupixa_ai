@@ -194,10 +194,15 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   borderRadius: BorderRadius.circular(18),
 
                   gradient: LinearGradient(
-                    colors: [Colors.white, Colors.white.withValues(alpha: 0.92)],
+                    colors: [
+                      Colors.white,
+                      Colors.white.withValues(alpha: 0.92),
+                    ],
                   ),
 
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.7)),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.7),
+                  ),
 
                   boxShadow: [
                     BoxShadow(
@@ -777,9 +782,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
       titleStyle: GoogleFonts.poppins(
         color: Colors.white,
-
         fontSize: fontSize,
-
         fontWeight: FontWeight.w600,
       ),
     );
@@ -794,6 +797,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     required String value,
     required IconData icon,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(18),
 
@@ -862,7 +866,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       padding: const EdgeInsets.all(20),
 
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
 
         borderRadius: BorderRadius.circular(28),
 
@@ -943,6 +947,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     required Color color,
     required IconData icon,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 18),
 
@@ -955,7 +961,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           padding: const EdgeInsets.all(22),
 
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.surface,
 
             borderRadius: BorderRadius.circular(30),
 
