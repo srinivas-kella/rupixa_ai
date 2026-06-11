@@ -9,7 +9,7 @@ import '../analytics/analytics_screen.dart';
 import '../bills/bills_screen.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../expenses/expenses_screen.dart';
-import '../settings/settings_screen.dart';
+import '../calendar/calendar_screen.dart';
 
 class BottomNavScreen extends StatefulWidget {
   const BottomNavScreen({super.key});
@@ -48,7 +48,7 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
 
       const AnalyticsScreen(),
 
-      const SettingsScreen(),
+      const CalendarScreen(),
     ];
   }
 
@@ -57,7 +57,7 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
     Icons.wallet_rounded,
     Icons.receipt_long_rounded,
     Icons.bar_chart_rounded,
-    Icons.settings_rounded,
+    Icons.calendar_month_rounded,
   ];
 
   final List<String> labels = [
@@ -65,7 +65,7 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
     "Expenses",
     "Bills",
     "Analytics",
-    "Settings",
+    "Calendar",
   ];
 
   @override

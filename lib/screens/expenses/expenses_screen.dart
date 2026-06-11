@@ -11,6 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/services/firestore_service.dart';
 import '../../core/utils/category_helper.dart';
 import '../../models/expense_model.dart';
+import 'package:intl/intl.dart';
 
 class ExpensesScreen extends StatefulWidget {
   const ExpensesScreen({super.key});
@@ -146,6 +147,19 @@ class _ExpensesScreenState extends State<ExpensesScreen>
     final icon = CategoryHelper.getCategoryIcon(category);
 
     final color = CategoryHelper.getCategoryColor(category);
+
+    DateTime? expenseDate;
+
+    if (expense.data() is Map<String, dynamic>) {
+      final data = expense.data() as Map<String, dynamic>;
+
+      if (data.containsKey('date') && data['date'] is Timestamp) {
+        expenseDate = (data['date'] as Timestamp).toDate();
+      } else if (data.containsKey('createdAt') &&
+          data['createdAt'] is Timestamp) {
+        expenseDate = (data['createdAt'] as Timestamp).toDate();
+      }
+    }
 
     showModalBottomSheet(
       context: context,
@@ -283,12 +297,63 @@ class _ExpensesScreenState extends State<ExpensesScreen>
 
                           Text(
                             "₹ ${expense['amount']}",
-
                             style: GoogleFonts.poppins(
                               color: colorScheme.onSurface,
                               fontSize: 42,
-
                               fontWeight: FontWeight.w700,
+                            ),
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: colorScheme.surfaceContainerHighest
+                                  .withValues(alpha: 0.35),
+                              borderRadius: BorderRadius.circular(18),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  CupertinoIcons.calendar,
+                                  color: primary,
+                                  size: 20,
+                                ),
+
+                                const SizedBox(width: 12),
+
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Created Date",
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 12,
+                                          color: colorScheme.onSurfaceVariant,
+                                        ),
+                                      ),
+
+                                      const SizedBox(height: 4),
+
+                                      Text(
+                                        expenseDate != null
+                                            ? DateFormat(
+                                                'dd MMM yyyy • hh:mm a',
+                                              ).format(expenseDate)
+                                            : 'Unknown',
+                                        style: GoogleFonts.poppins(
+                                          fontWeight: FontWeight.w600,
+                                          color: colorScheme.onSurface,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
 
@@ -318,7 +383,7 @@ class _ExpensesScreenState extends State<ExpensesScreen>
 
                                         category: expense['category'],
 
-                                        date: DateTime.now(),
+                                        date: expenseDate ?? DateTime.now(),
                                       ),
                                     );
                                   },
@@ -484,12 +549,54 @@ class _ExpensesScreenState extends State<ExpensesScreen>
             valueListenable: _searchNotifier,
 
             builder: (context, searchQuery, _) {
+              final now = DateTime.now();
+
               final expenses = allExpenses.where((expense) {
                 final title = expense['title'].toString().toLowerCase();
 
                 final matchesSearch = title.contains(searchQuery.toLowerCase());
 
-                return matchesSearch;
+                final data = expense.data() as Map<String, dynamic>;
+
+                DateTime? expenseDate;
+
+                if (data.containsKey('date') && data['date'] is Timestamp) {
+                  expenseDate = (data['date'] as Timestamp).toDate();
+                } else if (data.containsKey('createdAt') &&
+                    data['createdAt'] is Timestamp) {
+                  expenseDate = (data['createdAt'] as Timestamp).toDate();
+                }
+
+                bool matchesFilter = true;
+
+                if (expenseDate != null) {
+                  switch (selectedFilter) {
+                    case 'Today':
+                      matchesFilter =
+                          expenseDate.day == now.day &&
+                          expenseDate.month == now.month &&
+                          expenseDate.year == now.year;
+                      break;
+
+                    case 'Week':
+                      matchesFilter =
+                          now.difference(expenseDate).inDays >= 0 &&
+                          now.difference(expenseDate).inDays <= 7;
+                      break;
+
+                    case 'Month':
+                      matchesFilter =
+                          expenseDate.month == now.month &&
+                          expenseDate.year == now.year;
+                      break;
+
+                    case 'All':
+                    default:
+                      matchesFilter = true;
+                  }
+                }
+
+                return matchesSearch && matchesFilter;
               }).toList();
 
               return CustomScrollView(
@@ -622,7 +729,7 @@ class _ExpensesScreenState extends State<ExpensesScreen>
                                       child: _miniStat(
                                         title: "Transactions",
 
-                                        value: allExpenses.length.toString(),
+                                        value: expenses.length.toString(),
 
                                         icon: CupertinoIcons
                                             .money_dollar_circle_fill,
@@ -860,6 +967,19 @@ class _ExpensesScreenState extends State<ExpensesScreen>
                             final color = CategoryHelper.getCategoryColor(
                               category,
                             );
+                            DateTime? expenseDate;
+
+                            final data = expense.data() as Map<String, dynamic>;
+
+                            if (data.containsKey('date') &&
+                                data['date'] is Timestamp) {
+                              expenseDate = (data['date'] as Timestamp)
+                                  .toDate();
+                            } else if (data.containsKey('createdAt') &&
+                                data['createdAt'] is Timestamp) {
+                              expenseDate = (data['createdAt'] as Timestamp)
+                                  .toDate();
+                            }
 
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 18),
@@ -958,7 +1078,9 @@ class _ExpensesScreenState extends State<ExpensesScreen>
                                             padding: const EdgeInsets.all(16),
 
                                             decoration: BoxDecoration(
-                                              color: color.withValues(alpha: 0.12),
+                                              color: color.withValues(
+                                                alpha: 0.12,
+                                              ),
 
                                               borderRadius:
                                                   BorderRadius.circular(22),
@@ -1015,8 +1137,9 @@ class _ExpensesScreenState extends State<ExpensesScreen>
                                                           ),
 
                                                       decoration: BoxDecoration(
-                                                        color: color
-                                                            .withValues(alpha: 0.10),
+                                                        color: color.withValues(
+                                                          alpha: 0.10,
+                                                        ),
 
                                                         borderRadius:
                                                             BorderRadius.circular(
@@ -1041,12 +1164,16 @@ class _ExpensesScreenState extends State<ExpensesScreen>
                                                     ),
 
                                                     Text(
-                                                      "Today",
-
+                                                      expenseDate != null
+                                                          ? DateFormat(
+                                                              'dd MMM yyyy',
+                                                            ).format(
+                                                              expenseDate,
+                                                            )
+                                                          : "No Date",
                                                       style: GoogleFonts.poppins(
                                                         color: colorScheme
                                                             .onSurfaceVariant,
-
                                                         fontSize: 11,
                                                       ),
                                                     ),

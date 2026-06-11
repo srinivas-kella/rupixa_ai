@@ -15,6 +15,7 @@ class FirestoreService {
     required String category,
 
     required double amount,
+    required DateTime date,
   }) async {
     try {
       final user = _auth.currentUser;
@@ -37,6 +38,8 @@ class FirestoreService {
             'category': category,
 
             'amount': amount,
+
+            'date': Timestamp.fromDate(date),
 
             'createdAt': Timestamp.now(),
           });

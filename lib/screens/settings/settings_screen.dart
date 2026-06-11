@@ -611,6 +611,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
             SliverAppBar(
               pinned: true,
               automaticallyImplyLeading: false,
+
+              leading: Padding(
+                padding: const EdgeInsets.only(left: 12),
+                child: CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  minSize: 40,
+                  onPressed: () => Navigator.pop(context),
+                  child: Container(
+                    height: 40,
+                    width: 40,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .surfaceContainerHighest
+                          .withValues(alpha: 0.8),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(CupertinoIcons.chevron_back, size: 18),
+                  ),
+                ),
+              ),
               elevation: 0,
               toolbarHeight: 86,
               expandedHeight: 132,

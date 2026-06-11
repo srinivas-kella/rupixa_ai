@@ -275,6 +275,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
         title: title,
         category: selectedCategory,
         amount: amount,
+        date: selectedDate,
       );
 
       if (!mounted) {

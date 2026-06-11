@@ -14,7 +14,7 @@ import 'package:rupixa_ai/screens/expenses/calendar_screen.dart';
 import 'package:rupixa_ai/screens/expenses/cloud_expenses_screen.dart';
 import 'package:rupixa_ai/screens/insights/insights_screen.dart';
 import 'package:rupixa_ai/screens/notifications/notification_screen.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:rupixa_ai/screens/profile/profile_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   final Function(int)? onNavigate;
@@ -409,6 +409,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                           /// ACTIONS
                                           Row(
                                             children: [
+                                              /// NOTIFICATION
                                               GestureDetector(
                                                 onTap: () async {
                                                   await HapticFeedback.lightImpact();
@@ -423,23 +424,19 @@ class _DashboardScreenState extends State<DashboardScreen>
                                                     ),
                                                   );
                                                 },
-
                                                 child: Stack(
                                                   clipBehavior: Clip.none,
-
                                                   children: [
                                                     AnimatedContainer(
                                                       duration: const Duration(
                                                         milliseconds: 220,
                                                       ),
-
                                                       height: collapsed
                                                           ? 38
                                                           : 46,
                                                       width: collapsed
                                                           ? 38
                                                           : 46,
-
                                                       decoration: BoxDecoration(
                                                         borderRadius:
                                                             BorderRadius.circular(
@@ -447,7 +444,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                                                                   ? 12
                                                                   : 16,
                                                             ),
-
                                                         gradient:
                                                             LinearGradient(
                                                               colors: [
@@ -461,7 +457,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                                                                     ),
                                                               ],
                                                             ),
-
                                                         border: Border.all(
                                                           color: colorScheme
                                                               .outlineVariant
@@ -470,7 +465,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                                                               ),
                                                         ),
                                                       ),
-
                                                       child: Icon(
                                                         CupertinoIcons
                                                             .bell_fill,
@@ -485,7 +479,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                                                     Positioned(
                                                       top: -2,
                                                       right: -2,
-
                                                       child: StreamBuilder<QuerySnapshot>(
                                                         stream: FirebaseFirestore
                                                             .instance
@@ -497,7 +490,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                                                               isEqualTo: false,
                                                             )
                                                             .snapshots(),
-
                                                         builder: (context, snapshot) {
                                                           final count =
                                                               snapshot
@@ -513,7 +505,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                                                           return Container(
                                                             height: 18,
                                                             width: 18,
-
+                                                            alignment: Alignment
+                                                                .center,
                                                             decoration: BoxDecoration(
                                                               color: Colors
                                                                   .redAccent,
@@ -521,7 +514,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                                                                   BorderRadius.circular(
                                                                     20,
                                                                   ),
-
                                                               border: Border.all(
                                                                 color:
                                                                     colorScheme
@@ -529,16 +521,10 @@ class _DashboardScreenState extends State<DashboardScreen>
                                                                 width: 2,
                                                               ),
                                                             ),
-
-                                                            alignment: Alignment
-                                                                .center,
-
                                                             child: Text(
                                                               count > 99
                                                                   ? '99+'
-                                                                  : count
-                                                                        .toString(),
-
+                                                                  : '$count',
                                                               style: GoogleFonts.poppins(
                                                                 color: Colors
                                                                     .white,
@@ -558,42 +544,56 @@ class _DashboardScreenState extends State<DashboardScreen>
 
                                               const SizedBox(width: 10),
 
-                                              AnimatedContainer(
-                                                duration: const Duration(
-                                                  milliseconds: 220,
-                                                ),
+                                              /// PROFILE
+                                              GestureDetector(
+                                                onTap: () async {
+                                                  await HapticFeedback.lightImpact();
 
-                                                height: collapsed ? 38 : 46,
-                                                width: collapsed ? 38 : 46,
+                                                  if (!mounted) return;
 
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                        collapsed ? 12 : 16,
-                                                      ),
-
-                                                  gradient: LinearGradient(
-                                                    colors: [
-                                                      colorScheme.surface,
-                                                      colorScheme.surface
+                                                  Navigator.push(
+                                                    context,
+                                                    CupertinoPageRoute(
+                                                      builder: (_) =>
+                                                          const ProfileScreen(),
+                                                    ),
+                                                  );
+                                                },
+                                                child: AnimatedContainer(
+                                                  duration: const Duration(
+                                                    milliseconds: 220,
+                                                  ),
+                                                  height: collapsed ? 38 : 46,
+                                                  width: collapsed ? 38 : 46,
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          collapsed ? 12 : 16,
+                                                        ),
+                                                    gradient: LinearGradient(
+                                                      colors: [
+                                                        colorScheme.surface,
+                                                        colorScheme.surface
+                                                            .withValues(
+                                                              alpha: 0.92,
+                                                            ),
+                                                      ],
+                                                    ),
+                                                    border: Border.all(
+                                                      color: colorScheme
+                                                          .outlineVariant
                                                           .withValues(
-                                                            alpha: 0.92,
+                                                            alpha: 0.5,
                                                           ),
-                                                    ],
+                                                    ),
                                                   ),
-
-                                                  border: Border.all(
-                                                    color: colorScheme
-                                                        .outlineVariant
-                                                        .withValues(alpha: 0.5),
+                                                  child: Icon(
+                                                    CupertinoIcons
+                                                        .person_crop_circle_fill,
+                                                    size: collapsed ? 18 : 20,
+                                                    color:
+                                                        colorScheme.onSurface,
                                                   ),
-                                                ),
-
-                                                child: Icon(
-                                                  CupertinoIcons
-                                                      .person_crop_circle_fill,
-                                                  size: collapsed ? 18 : 20,
-                                                  color: colorScheme.onSurface,
                                                 ),
                                               ),
                                             ],
