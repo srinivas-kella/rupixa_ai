@@ -75,8 +75,8 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-
       extendBody: true,
+      backgroundColor: Colors.transparent,
 
       body: NotificationListener<UserScrollNotification>(
         onNotification: (notification) {
@@ -149,7 +149,12 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
             top: false,
 
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
+              padding: EdgeInsets.fromLTRB(
+                18,
+                0,
+                18,
+                MediaQuery.of(context).padding.bottom + 8,
+              ),
 
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(32),

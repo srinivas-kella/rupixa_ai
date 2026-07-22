@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:rupixa_ai/screens/insights/insights_screen.dart';
 import 'package:rupixa_ai/screens/settings/settings_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -201,7 +200,7 @@ class ProfileScreen extends StatelessWidget {
 
               reverseTransitionDuration: const Duration(milliseconds: 350),
 
-              pageBuilder: (_, animation, __) {
+              pageBuilder: (_, animation, _) {
                 return FadeTransition(
                   opacity: animation,
                   child: const SettingsScreen(),

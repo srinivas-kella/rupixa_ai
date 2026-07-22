@@ -172,15 +172,15 @@ class _DashboardScreenState extends State<DashboardScreen>
     final isDark = colorScheme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      extendBody: true,
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
 
-      body: Container(
+      body: DecoratedBox(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
-
             end: Alignment.bottomCenter,
-
             colors: isDark
                 ? const [
                     Color(0xFF0E1320),
@@ -194,7 +194,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                   ],
           ),
         ),
-
         child: SafeArea(
           child: FadeTransition(
             opacity: _fadeAnimation,
@@ -242,7 +241,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                         : "Critical";
 
                     return CustomScrollView(
-                      physics: const BouncingScrollPhysics(),
+                      physics: const BouncingScrollPhysics(
+                        parent: AlwaysScrollableScrollPhysics(),
+                      ),
 
                       slivers: [
                         SliverAppBar(
@@ -263,12 +264,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                               final collapsed = top <= kToolbarHeight + 18;
 
                               return Container(
-                                decoration: BoxDecoration(
-                                  color: collapsed
-                                      ? colorScheme.surface.withValues(
-                                          alpha: 0.90,
-                                        )
-                                      : Colors.transparent,
+                                decoration: const BoxDecoration(
+                                  color: Colors.transparent,
                                 ),
 
                                 child: ClipRect(
@@ -1237,7 +1234,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                             width * 0.05,
                             0,
                             width * 0.05,
-                            140,
+                            220,
                           ),
 
                           sliver: SliverList(

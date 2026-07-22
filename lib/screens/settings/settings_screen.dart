@@ -616,8 +616,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 padding: const EdgeInsets.only(left: 12),
                 child: CupertinoButton(
                   padding: EdgeInsets.zero,
-                  minSize: 40,
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () => Navigator.pop(context), minimumSize: Size(40, 40),
                   child: Container(
                     height: 40,
                     width: 40,
